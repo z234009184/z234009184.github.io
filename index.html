@@ -5,37 +5,50 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>蛋播星球 - 全平台影视应用</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg-color: #050507;
-            --card-bg: rgba(255, 255, 255, 0.03);
-            --card-border: rgba(255, 255, 255, 0.05);
-            --primary: #00f2fe;
-            --secondary: #4facfe;
-            --accent: #ff0055;
-            --text-main: #ffffff;
-            --text-muted: #8b9bb4;
-            --glow-color: rgba(0, 242, 254, 0.15);
-        }
 
+    <!-- 引入字体图标 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        /* 基础重置 */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
         }
 
+        /* 主题配色 */
+        :root {
+            --primary: #00d4ff;
+            --primary-dark: #0099cc;
+            --secondary: #7b2ff7;
+            --accent: #ff006e;
+            --dark-bg: #0a0a0f;
+            --card-bg: rgba(20, 20, 30, 0.7);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --text-primary: #ffffff;
+            --text-secondary: #b4b4b4;
+            --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --gradient-4: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+
+        /* 背景效果 */
         body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            overflow-x: hidden;
+            background: var(--dark-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
             min-height: 100vh;
+            overflow-x: hidden;
             position: relative;
         }
 
-        /* Canvas Particle Background */
+        body::before {
+            content: none;
+        }
+
         #particle-canvas {
             position: fixed;
             top: 0;
@@ -46,289 +59,321 @@
             pointer-events: none;
         }
 
-        /* Dynamic Background */
-        .bg-orb {
-            position: fixed;
-            border-radius: 50%;
-            filter: blur(100px);
-            z-index: -2;
-            /* Move behind canvas */
-            opacity: 0.4;
-            animation: float 20s infinite alternate;
-        }
-
-        .orb-1 {
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, #4facfe 0%, transparent 70%);
-            top: -200px;
-            left: -100px;
-        }
-
-        .orb-2 {
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, #ff0055 0%, transparent 70%);
-            bottom: -100px;
-            right: -100px;
-            animation-delay: -5s;
-        }
-
-        .orb-3 {
-            width: 300px;
-            height: 300px;
-            background: radial-gradient(circle, #7b2ff7 0%, transparent 70%);
-            top: 40%;
-            left: 60%;
-            animation-delay: -10s;
-        }
-
-        @keyframes float {
-            0% {
-                transform: translate(0, 0) rotate(0deg);
-            }
-
-            100% {
-                transform: translate(50px, 50px) rotate(20deg);
-            }
-        }
-
-        /* Navbar */
-        nav {
-            position: fixed;
-            top: 0;
-            width: 100%;
+        /* 导航栏 */
+        .navbar {
             padding: 1.5rem 5%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 100;
+            background: rgba(10, 10, 15, 0.8);
             backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            transition: all 0.3s ease;
+            -webkit-backdrop-filter: blur(20px);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid var(--card-border);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .navbar.scrolled {
+            padding: 1rem 5%;
+            background: rgba(10, 10, 15, 0.95);
         }
 
         .logo {
-            font-size: 1.5rem;
-            font-weight: 800;
-            background: linear-gradient(to right, #fff, #4facfe);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: -1px;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-decoration: none;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 0.8rem;
+            transition: transform 0.3s ease;
         }
 
-        .logo i {
-            font-size: 1.2rem;
-            color: var(--primary);
+        .logo:hover {
+            transform: scale(1.05);
         }
 
-        /* Hero Section */
+        .logo img {
+            height: 40px;
+            width: auto;
+            transition: transform 0.3s ease;
+        }
+
+        .logo:hover img {
+            transform: rotate(360deg);
+        }
+
+        /* 主要内容容器 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 8rem 5% 4rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* 英雄区域 */
         .hero {
-            min-height: 100vh;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            padding: 0 10%;
-            padding-top: 80px;
+            gap: 4rem;
+            flex-wrap: wrap;
+            margin-bottom: 6rem;
+        }
+
+        .content {
+            flex: 1 1 50%;
+            min-width: 300px;
+        }
+
+        .content h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+            background: linear-gradient(135deg, #fff 0%, var(--primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 800;
+        }
+
+        .content h6 {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 400;
+            margin-bottom: 1.5rem;
+            letter-spacing: 0.5px;
+        }
+
+        .content>p {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin-bottom: 2.5rem;
+            line-height: 1.8;
+        }
+
+        /* 应用预览图 */
+        .app-image {
+            flex: 1 1 40%;
+            text-align: center;
             position: relative;
         }
 
-        .hero-content {
-            flex: 1;
-            max-width: 600px;
-            z-index: 2;
+        .app-image::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            height: 80%;
+            background: var(--gradient-3);
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.3;
+            z-index: -1;
         }
 
-        .badge {
-            display: inline-block;
-            padding: 8px 16px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50px;
-            font-size: 0.9rem;
-            color: var(--primary);
-            margin-bottom: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            animation: fadeInDown 0.8s ease-out;
+        .app-image img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 24px;
+            box-shadow:
+                0 20px 60px rgba(0, 0, 0, 0.5),
+                0 0 40px rgba(0, 212, 255, 0.2);
+            transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        h1 {
-            font-size: 4.5rem;
-            line-height: 1.1;
-            margin-bottom: 20px;
-            font-weight: 800;
-            letter-spacing: -2px;
-            animation: fadeInUp 0.8s ease-out 0.2s backwards;
+        .app-image img:hover {
+            transform: scale(1.05) rotate(2deg);
         }
 
-        .gradient-text {
-            background: linear-gradient(135deg, #fff 0%, #4facfe 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
+        /* 下载按钮网格 */
+        .download-buttons {
+            margin: 2rem 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
         }
 
-        p.subtitle {
-            font-size: 1.2rem;
-            color: var(--text-muted);
-            margin-bottom: 40px;
-            line-height: 1.6;
-            animation: fadeInUp 0.8s ease-out 0.4s backwards;
-        }
-
-        /* Buttons */
-        .btn-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            animation: fadeInUp 0.8s ease-out 0.6s backwards;
-        }
-
+        /* 按钮样式 */
         .btn {
-            padding: 16px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.2rem 2rem;
             border-radius: 16px;
             text-decoration: none;
+            color: white;
+            font-size: 1rem;
             font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            gap: 0.8rem;
             position: relative;
             overflow: hidden;
-            border: 1px solid transparent;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--secondary), var(--primary));
-            color: #000;
-            box-shadow: 0 10px 30px -10px var(--secondary);
-        }
-
-        .btn-glass {
-            background: rgba(255, 255, 255, 0.05);
-            color: #fff;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
             backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .btn:hover::before {
+            left: 100%;
         }
 
         .btn:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 40px -10px var(--glow-color);
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+            border-color: rgba(255, 255, 255, 0.2);
         }
 
-        .btn-glass:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: #fff;
+        .btn:active {
+            transform: translateY(-2px) scale(0.98);
         }
 
-        /* 3D Image Effect */
-        .hero-visual {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            perspective: 1000px;
-            animation: fadeInRight 1s ease-out 0.4s backwards;
-            position: relative;
-            z-index: 1;
+        .btn i {
+            font-size: 1.3rem;
+            transition: transform 0.3s ease;
         }
 
-        .image-wrapper {
-            max-width: 100%;
-            height: auto;
-            position: relative;
-            transform-style: preserve-3d;
-            transform: rotateY(-10deg) rotateX(5deg);
-            transition: transform 0.1s ease-out;
+        .btn:hover i {
+            transform: scale(1.2) rotate(5deg);
         }
 
-        .app-screenshot {
-            max-width: 100%;
-            width: 420px;
-            /* Slightly larger base width */
-            height: auto;
-            border-radius: 20px;
-            box-shadow:
-                -20px 20px 60px rgba(0, 0, 0, 0.5),
-                0 0 40px rgba(0, 242, 254, 0.2);
-            display: block;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        /* 按钮配色 */
+        .ios {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            border-color: rgba(255, 255, 255, 0.15);
         }
 
-        /* Quotes Section */
-        .quotes-section {
-            padding: 100px 10%;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
+        .ios:hover {
+            box-shadow: 0 8px 30px rgba(255, 255, 255, 0.2);
         }
 
+        .android {
+            background: linear-gradient(135deg, #3DDC84 0%, #2db664 100%);
+            border-color: rgba(61, 220, 132, 0.3);
+        }
+
+        .android:hover {
+            box-shadow: 0 8px 30px rgba(61, 220, 132, 0.4);
+        }
+
+        .mac {
+            background: linear-gradient(135deg, #0066CC 0%, #0052a3 100%);
+            border-color: rgba(0, 102, 204, 0.3);
+        }
+
+        .mac:hover {
+            box-shadow: 0 8px 30px rgba(0, 102, 204, 0.4);
+        }
+
+        .windows {
+            background: linear-gradient(135deg, #0078D4 0%, #0063b1 100%);
+            border-color: rgba(0, 120, 212, 0.3);
+        }
+
+        .windows:hover {
+            box-shadow: 0 8px 30px rgba(0, 120, 212, 0.4);
+        }
+
+        /* 引用卡片 */
         .quote-card {
             background: var(--card-bg);
             border: 1px solid var(--card-border);
-            padding: 35px;
-            border-radius: 24px;
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
             backdrop-filter: blur(10px);
-            transition: all 0.4s ease;
+            -webkit-backdrop-filter: blur(10px);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
         }
 
         .quote-card::before {
-            content: '"';
+            content: '';
             position: absolute;
-            top: -10px;
-            left: 20px;
-            font-size: 120px;
-            color: rgba(255, 255, 255, 0.03);
-            font-family: serif;
-            line-height: 1;
-            pointer-events: none;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--gradient-3);
+            transform: scaleY(0);
+            transition: transform 0.4s ease;
         }
 
         .quote-card:hover {
-            transform: translateY(-10px);
-            border-color: var(--primary);
-            box-shadow: 0 20px 40px -20px var(--glow-color);
+            transform: translateY(-5px);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
         }
 
-        .quote-text {
-            font-size: 1.1rem;
-            line-height: 1.8;
-            color: #e0e0e0;
-            margin-bottom: 25px;
-            position: relative;
-            z-index: 1;
-            font-weight: 300;
+        .quote-card:hover::before {
+            transform: scaleY(1);
         }
 
-        .quote-author {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            text-align: right;
+        .quote-card h3 {
+            font-size: 1.3rem;
+            line-height: 1.7;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .quote-card p {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin: 0;
             font-style: italic;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            padding-top: 15px;
         }
 
-        /* Footer */
-        footer {
-            text-align: center;
-            padding: 50px 0;
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            border-top: 1px solid var(--card-border);
-            background: rgba(0, 0, 0, 0.2);
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .container {
+                padding-top: 6rem;
+            }
+
+            .hero {
+                flex-direction: column;
+                text-align: center;
+                gap: 2rem;
+            }
+
+            .content h1 {
+                font-size: 2.5rem;
+            }
+
+            .download-buttons {
+                grid-template-columns: 1fr;
+            }
+
+            .btn {
+                padding: 1.1rem 1.5rem;
+            }
+
+            .quote-card {
+                padding: 1.5rem;
+            }
+
+            .quote-card h3 {
+                font-size: 1.1rem;
+            }
         }
 
-        /* Animations */
+        /* 动画效果 */
         @keyframes fadeInUp {
             from {
                 opacity: 0;
@@ -341,22 +386,10 @@
             }
         }
 
-        @keyframes fadeInDown {
-            from {
-                opacity: 0;
-                transform: translateY(-30px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
         @keyframes fadeInRight {
             from {
                 opacity: 0;
-                transform: translateX(50px);
+                transform: translateX(-30px);
             }
 
             to {
@@ -365,291 +398,228 @@
             }
         }
 
-        /* Responsive */
-        @media (max-width: 1024px) {
-            .hero {
-                flex-direction: column;
-                text-align: center;
-                padding-top: 120px;
-            }
-
-            .hero-content {
-                margin-bottom: 60px;
-            }
-
-            .btn-group {
-                justify-content: center;
-            }
-
-            .image-wrapper {
-                transform: rotateY(0) rotateX(0);
-            }
-
-            h1 {
-                font-size: 3rem;
-            }
+        .animated {
+            animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            opacity: 0;
         }
 
-        @media (max-width: 768px) {
-            .btn {
-                width: 100%;
-                justify-content: center;
-            }
+        .animated-right {
+            animation: fadeInRight 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            opacity: 0;
+        }
 
-            .app-screenshot {
-                width: 100%;
-                max-width: 320px;
-            }
+        /* 滚动条样式 */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--dark-bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--card-bg);
+            border-radius: 5px;
+            border: 2px solid var(--dark-bg);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* 平滑滚动 */
+        html {
+            scroll-behavior: smooth;
         }
     </style>
 </head>
 
 <body>
-    <!-- Particle Background -->
     <canvas id="particle-canvas"></canvas>
+    <!-- 主要内容 -->
+    <div class="container">
+        <section class="hero">
+            <div class="content animated">
+                <h1>蛋播星球</h1>
+                <h6 style="color: grey;">该软件仅用于技术学习</h6>
+                <p>你知道，有些鸟儿是注定不会被关在牢笼里的，它们的每一片羽毛都闪耀着自由的光辉。《肖申克的救赎》</p>
 
-    <!-- Background Orbs (Optional, kept for depth) -->
-    <div class="bg-orb orb-1"></div>
-    <div class="bg-orb orb-2"></div>
-    <div class="bg-orb orb-3"></div>
-
-    <nav>
-        <div class="logo">
-            <i class="fas fa-planet-ringed"></i>
-            DANBO PLANET
-        </div>
-    </nav>
-
-    <section class="hero">
-        <div class="hero-content">
-            <h1><span class="gradient-text">蛋播星球</span></h1>
-            <h6 style="color: grey; margin-bottom: 1.5rem; font-weight: 400;">该软件仅用于技术学习</h6>
-            <p class="subtitle">
-                你知道，有些鸟儿是注定不会被关在牢笼里的，它们的每一片羽毛都闪耀着自由的光辉。《肖申克的救赎》
-            </p>
-
-            <div class="btn-group">
-                <a href="https://testflight.apple.com/join/bDb7WBtD" class="btn btn-primary">
-                    <i class="fab fa-apple"></i>
-                    <span>iOS TestFlight</span>
-                </a>
-                <a href="https://danboxq.lanzouq.com/izEw739499lg" class="btn btn-glass">
-                    <i class="fas fa-signature"></i>
-                    <span>iOS IPA自签</span>
-                </a>
-                <a href="https://danboxq.lanzouq.com/iJntJ3948zrc" class="btn btn-glass">
-                    <i class="fab fa-android"></i>
-                    <span>Android 下载</span>
-                </a>
-                <a href="https://danboxq.lanzouq.com/inD5q3949nti" class="btn btn-glass">
-                    <i class="fab fa-apple"></i>
-                    <span>macOS 下载</span>
-                </a>
-                <a href="https://danboxq.lanzouq.com/iZn5B394b1yd" class="btn btn-glass">
-                    <i class="fab fa-windows"></i>
-                    <span>Windows 下载</span>
-                </a>
-                <a href="https://danboxq.lanzouq.com/b0mbh69vc" class="btn btn-glass">
-                    <i class="fas fa-cloud-download-alt"></i>
-                    <span>网盘地址</span>
-                </a>
+                <!-- 下载按钮 -->
+                <div class="download-buttons">
+                    <a href="https://testflight.apple.com/join/bDb7WBtD" class="btn ios">
+                        <i class="fab fa-apple"></i>
+                        iOS/TestFlight安装
+                    </a>
+                    <a href="https://danboxq.lanzouq.com/ioVva3c2eufc" class="btn ios">
+                        <i class="fab fa-apple"></i>
+                        iOS/ipa(需自签)
+                    </a>
+                    <a class="btn android" href="https://danboxq.lanzouq.com/iHCAj3c2eo4f">
+                        <i class="fab fa-android"></i>
+                        Android
+                    </a>
+                    <!--<a class="btn mac" href="https://danboxq.lanzouq.com/iURXV33r670h">-->
+                    <!--    <i class="fab fa-apple"></i>-->
+                    <!--    macOS Intel-->
+                    <!--</a>-->
+                    <a class="btn mac" href="https://danboxq.lanzouq.com/i9h7R3c2f08b">
+                        <i class="fab fa-apple"></i>
+                        MacOS
+                    </a>
+                    <a class="btn windows" href="https://danboxq.lanzouq.com/iimpp3c2f4na">
+                        <i class="fab fa-windows"></i>
+                        Windows
+                    </a>
+                    <a class="btn ios" href="https://danboxq.lanzouq.com/b0mbh69vc">
+                        网盘地址
+                    </a>
+                </div>
             </div>
-        </div>
 
-        <div class="hero-visual">
-            <div class="image-wrapper">
-                <img src="https://hyhycw.oss-cn-shenzhen.aliyuncs.com/cw/placehold.png" alt="App Screenshot"
-                    class="app-screenshot">
+            <!-- 应用截图占位 -->
+            <div class="app-image animated-right" style="animation-delay: 0.2s">
+                <img src="https://hyhycw.oss-cn-shenzhen.aliyuncs.com/cw/placehold.png" alt="蛋播星球界面预览">
             </div>
-        </div>
-    </section>
+        </section>
 
-    <section class="quotes-section">
-        <div class="quote-card">
-            <p class="quote-text">人生总是这么苦，还是只有童年如此？</p>
-            <div class="quote-author">—— 《这个杀手不太冷》</div>
-        </div>
-        <div class="quote-card">
-            <p class="quote-text">一个人总要走陌生的路，看陌生的风景，听陌生的歌，然后在某个不经意的瞬间，你会发现，原本是费尽心机想要忘记的事情真的就那么忘记了。</p>
-            <div class="quote-author">—— 《蓝莓之夜》</div>
-        </div>
-        <div class="quote-card">
-            <p class="quote-text">你要尽全力保护你的梦想。那些嘲笑你梦想的人，他们注定失败，他们想把你变成和他们一样。我坚信，只要心中有梦想，我就会与众不同。你也是。</p>
-            <div class="quote-author">—— 《当幸福来敲门》</div>
-        </div>
-        <div class="quote-card">
-            <p class="quote-text">罐头是在1810年发明出来的，可是，开罐器却在1858年才被发明出来。很奇怪吧，有时候就是这样，重要的东西有时也会迟来一步，无论是爱情还是生活。</p>
-            <div class="quote-author">—— 《最完美的离婚》</div>
-        </div>
-    </section>
+        <!-- 电影引用卡片区域 -->
+        <section class="quotes-section">
+            <div class="quote-card animated" style="animation-delay: 0.1s">
+                <h3>人生总是这么苦，还是只有童年如此？</h3>
+                <p>— 《这个杀手不太冷》</p>
+            </div>
 
-    <footer>
-        <p>© 2023 蛋播星球. All Rights Reserved. <br> 该软件仅用于技术学习，请于下载后24小时内删除。</p>
-    </footer>
+            <div class="quote-card animated" style="animation-delay: 0.2s">
+                <h3>一个人总要走陌生的路，看陌生的风景，听陌生的歌，然后在某个不经意的瞬间，你会发现，原本是费尽心机想要忘记的事情真的就那么忘记了。</h3>
+                <p>— 《蓝莓之夜》</p>
+            </div>
+
+            <div class="quote-card animated" style="animation-delay: 0.3s">
+                <h3>你要尽全力保护你的梦想。那些嘲笑你梦想的人，他们注定失败，他们想把你变成和他们一样。我坚信，只要心中有梦想，我就会与众不同。你也是。</h3>
+                <p>— 《当幸福来敲门》</p>
+            </div>
+
+            <div class="quote-card animated" style="animation-delay: 0.4s">
+                <h3>罐头是在1810年发明出来的，可是，开罐器却在1858年才被发明出来。很奇怪吧，有时候就是这样，重要的东西有时也会迟来一步，无论是爱情还是生活。</h3>
+                <p>— 《最完美的离婚》</p>
+            </div>
+        </section>
+    </div>
+    <!-- <script src="https://api.vvhan.com/api/script/snow"></script> -->
+    <!-- <script type="text/javascript" src="https://api.zxki.cn/api/yhpl"></script> -->
+    <!-- <script src="https://api.vvhan.com/api/script/bolang"></script> -->
+    <script src="particles.js"></script>
 
     <script>
-        // --- Fluid Flow Field Animation (Antigravity Style) ---
-        const canvas = document.getElementById('particle-canvas');
-        const ctx = canvas.getContext('2d');
-
-        let particlesArray = [];
-        let animationId;
-        let hue = 0;
-
-        // Configuration
-        const config = {
-            particleCount: 1000, // High density for fluid look
-            trailLength: 0.15,   // Lower = longer trails
-            speed: 0.5,
-            mouseForce: 5,
-            noiseScale: 0.005
-        };
-
-        // Set canvas size
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-
-        // Handle resize
-        window.addEventListener('resize', () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            initParticles();
-        });
-
-        // Mouse interaction
-        const mouse = {
-            x: undefined,
-            y: undefined,
-            radius: 200
-        }
-
-        window.addEventListener('mousemove', (event) => {
-            mouse.x = event.x;
-            mouse.y = event.y;
-        });
-
-        window.addEventListener('mouseout', () => {
-            mouse.x = undefined;
-            mouse.y = undefined;
-        });
-
-        // Particle Class
-        class Particle {
-            constructor() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.vx = 0;
-                this.vy = 0;
-                this.size = Math.random() * 2 + 0.5;
-                this.color = `rgba(255, 255, 255, ${Math.random() * 0.5 + 0.1})`;
-                this.life = Math.random() * 100;
+        // 导航栏滚动效果
+        window.addEventListener('scroll', () => {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
             }
+        });
 
-            update() {
-                // Flow Field Logic (Simplex Noise-ish)
-                // Create a grid of angles based on position
-                const angle = (Math.cos(this.x * config.noiseScale) + Math.sin(this.y * config.noiseScale)) * Math.PI * 2;
+        // 页面加载动画
+        document.addEventListener('DOMContentLoaded', () => {
+            // 观察者API用于动画触发
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
 
-                // Base velocity from flow field
-                this.vx += Math.cos(angle) * 0.05;
-                this.vy += Math.sin(angle) * 0.05;
-
-                // Mouse Interaction (Repel/Attract/Swirl)
-                if (mouse.x != undefined) {
-                    const dx = mouse.x - this.x;
-                    const dy = mouse.y - this.y;
-                    const distance = Math.sqrt(dx * dx + dy * dy);
-
-                    if (distance < mouse.radius) {
-                        const forceDirectionX = dx / distance;
-                        const forceDirectionY = dy / distance;
-                        const force = (mouse.radius - distance) / mouse.radius;
-
-                        // Push away slightly to create "parting the sea" effect
-                        // Or create a swirl by swapping X/Y
-                        this.vx -= forceDirectionX * force * config.mouseForce * 0.1;
-                        this.vy -= forceDirectionY * force * config.mouseForce * 0.1;
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.animationPlayState = 'running';
                     }
-                }
+                });
+            }, observerOptions);
 
-                // Friction to keep speed in check
-                this.vx *= 0.95;
-                this.vy *= 0.95;
-
-                // Move
-                this.x += this.vx + (Math.random() - 0.5) * 0.5; // Add jitter for organic feel
-                this.y += this.vy + (Math.random() - 0.5) * 0.5;
-
-                // Wrap around screen
-                if (this.x > canvas.width) this.x = 0;
-                if (this.x < 0) this.x = canvas.width;
-                if (this.y > canvas.height) this.y = 0;
-                if (this.y < 0) this.y = canvas.height;
-            }
-
-            draw() {
-                ctx.fillStyle = this.color;
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fill();
-            }
-        }
-
-        function initParticles() {
-            particlesArray = [];
-            for (let i = 0; i < config.particleCount; i++) {
-                particlesArray.push(new Particle());
-            }
-        }
-
-        function animate() {
-            // Create trails by not fully clearing the canvas
-            ctx.fillStyle = `rgba(5, 5, 7, ${config.trailLength})`;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            for (let i = 0; i < particlesArray.length; i++) {
-                particlesArray[i].update();
-                particlesArray[i].draw();
-            }
-            requestAnimationFrame(animate);
-        }
-
-        initParticles();
-        animate();
-
-        // 3D Tilt Effect for Image
-        const wrapper = document.querySelector('.image-wrapper');
-        const heroVisual = document.querySelector('.hero-visual');
-
-        if (heroVisual && wrapper) {
-            heroVisual.addEventListener('mousemove', (e) => {
-                const rect = heroVisual.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-
-                const centerX = rect.width / 2;
-                const centerY = rect.height / 2;
-
-                // Limit rotation to 10 degrees
-                const rotateX = ((y - centerY) / centerY) * -10;
-                const rotateY = ((x - centerX) / centerX) * 10;
-
-                wrapper.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+            // 观察所有动画元素
+            document.querySelectorAll('.animated, .animated-right, .quote-card').forEach(el => {
+                observer.observe(el);
             });
 
-            heroVisual.addEventListener('mouseleave', () => {
-                wrapper.style.transform = 'rotateY(-10deg) rotateX(5deg)';
-            });
-        }
+            // 按钮点击涟漪效果
+            document.querySelectorAll('.btn').forEach(button => {
+                button.addEventListener('click', function (e) {
+                    const rect = this.getBoundingClientRect();
+                    const ripple = document.createElement('span');
+                    const size = Math.max(rect.width, rect.height);
+                    const x = e.clientX - rect.left - size / 2;
+                    const y = e.clientY - rect.top - size / 2;
 
-        // Smooth Scroll
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                document.querySelector(this.getAttribute('href')).scrollIntoView({
-                    behavior: 'smooth'
+                    ripple.style.cssText = `
+                        position: absolute;
+                        border-radius: 50%;
+                        background: rgba(255, 255, 255, 0.3);
+                        width: ${size}px;
+                        height: ${size}px;
+                        left: ${x}px;
+                        top: ${y}px;
+                        animation: ripple 0.6s ease-out;
+                        pointer-events: none;
+                    `;
+
+                    this.appendChild(ripple);
+                    setTimeout(() => ripple.remove(), 600);
                 });
             });
+
+            // 添加涟漪动画样式
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes ripple {
+                    to {
+                        transform: scale(2);
+                        opacity: 0;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+        });
+
+        // 平滑滚动到顶部
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        // 下载功能
+        function download(lanzouUrl) {
+            // 调用第三方解析API
+            fetch(`https://api.zxki.cn/api/lzy?url=${encodeURIComponent(lanzouUrl)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.data.length > 0) {
+                        const dict = data.data[0];
+                        const link = document.createElement('a');
+                        link.href = dict.download;
+                        link.download = 'danbo.apk';
+                        link.style.display = 'none';
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                    } else {
+                        alert('解析失败，请检查链接或密码！');
+                    }
+                })
+                .catch(error => console.error('API请求失败：', error));
+        }
+
+        // 鼠标移动视差效果（可选）
+        document.addEventListener('mousemove', (e) => {
+            const moveX = (e.clientX - window.innerWidth / 2) * 0.01;
+            const moveY = (e.clientY - window.innerHeight / 2) * 0.01;
+
+            const appImage = document.querySelector('.app-image img');
+            if (appImage) {
+                appImage.style.transform = `translate(${moveX}px, ${moveY}px) scale(1)`;
+            }
         });
     </script>
 </body>
