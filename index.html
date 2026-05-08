@@ -470,7 +470,7 @@
                         <i class="fab fa-windows"></i>
                         Windows
                     </a>
-                    <a class="btn ios" href="https://danboxq.lanzouq.com/b0mbh69vc">
+                    <a class="btn ios" href="https://danboxq.lanzouq.com/b0mbh69vc" data-skip-resolve="true">
                         网盘地址
                     </a>
                 </div>
@@ -521,6 +521,33 @@
             }
         });
 
+        const LANZOU_RESOLVER_API = 'http://lanzou.opengl.top/lanzouyunapi.php?url=';
+
+        function isLanzouLink(url) {
+            return /lanzou/i.test(url);
+        }
+
+        function triggerDownload(url) {
+            const link = document.createElement('a');
+            link.href = url;
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        async function resolveLanzouDirectUrl(lanzouUrl) {
+            const response = await fetch(`${LANZOU_RESOLVER_API}${encodeURIComponent(lanzouUrl)}`);
+            const result = await response.json();
+            const directUrl = result && result.data && result.data.url;
+
+            if (!directUrl) {
+                throw new Error('invalid_resolver_response');
+            }
+
+            return directUrl;
+        }
+
         // 页面加载动画
         document.addEventListener('DOMContentLoaded', () => {
             // 观察者API用于动画触发
@@ -544,7 +571,7 @@
 
             // 按钮点击涟漪效果
             document.querySelectorAll('.btn').forEach(button => {
-                button.addEventListener('click', function (e) {
+                button.addEventListener('click', async function (e) {
                     const rect = this.getBoundingClientRect();
                     const ripple = document.createElement('span');
                     const size = Math.max(rect.width, rect.height);
@@ -565,6 +592,32 @@
 
                     this.appendChild(ripple);
                     setTimeout(() => ripple.remove(), 600);
+
+                    const href = this.getAttribute('href');
+                    if (!href || this.dataset.skipResolve === 'true' || !isLanzouLink(href) || this.dataset.resolving === 'true') {
+                        return;
+                    }
+
+                    e.preventDefault();
+                    this.dataset.resolving = 'true';
+                    const originText = this.innerHTML;
+
+                    this.style.pointerEvents = 'none';
+                    this.style.opacity = '0.8';
+                    this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 解析中...';
+
+                    try {
+                        const directUrl = await resolveLanzouDirectUrl(href);
+                        triggerDownload(directUrl);
+                    } catch (error) {
+                        console.error('蓝奏直链解析失败：', error);
+                        alert('下载链接解析失败，请稍后重试');
+                    } finally {
+                        this.dataset.resolving = 'false';
+                        this.style.pointerEvents = '';
+                        this.style.opacity = '';
+                        this.innerHTML = originText;
+                    }
                 });
             });
 
@@ -587,28 +640,6 @@
                 top: 0,
                 behavior: 'smooth'
             });
-        }
-
-        // 下载功能
-        function download(lanzouUrl) {
-            // 调用第三方解析API
-            fetch(`https://api.zxki.cn/api/lzy?url=${encodeURIComponent(lanzouUrl)}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.data.length > 0) {
-                        const dict = data.data[0];
-                        const link = document.createElement('a');
-                        link.href = dict.download;
-                        link.download = 'danbo.apk';
-                        link.style.display = 'none';
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
-                    } else {
-                        alert('解析失败，请检查链接或密码！');
-                    }
-                })
-                .catch(error => console.error('API请求失败：', error));
         }
 
         // 鼠标移动视差效果（可选）
