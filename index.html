@@ -1072,7 +1072,7 @@
             }
         });
 
-        const LANZOU_RESOLVER_API = 'https://lanzou.opengl.top/lanzouyunapi.php?url=';
+        const LANZOU_RESOLVER_API = 'https://lanzou.opengl.top/index.php?url=';
 
         function isLanzouLink(url) {
             return /lanzou/i.test(url);
@@ -1090,7 +1090,7 @@
         async function resolveLanzouDirectUrl(lanzouUrl) {
             const response = await fetch(`${LANZOU_RESOLVER_API}${encodeURIComponent(lanzouUrl)}`);
             const result = await response.json();
-            const directUrl = result && result.data && result.data.url;
+            const directUrl = result && result.downUrl;
 
             if (!directUrl) {
                 throw new Error('invalid_resolver_response');
