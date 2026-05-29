@@ -437,10 +437,8 @@
             font-family: var(--font-sans);
             position: relative;
             overflow: hidden;
-            background: var(--surface-glass);
+            background: #1a1a1e;
             border: 1px solid var(--border-subtle);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
             transition: all var(--duration-normal) var(--ease-out);
             cursor: pointer;
             will-change: transform;
@@ -453,7 +451,7 @@
 
         .btn:hover {
             transform: translateY(-2px);
-            background: var(--surface-glass-hover);
+            filter: brightness(1.15);
             border-color: var(--border-medium);
             box-shadow: var(--shadow-md);
         }
@@ -474,60 +472,60 @@
         /* Platform-specific button colors */
         .btn--ios {
             border-left: 3px solid #a2aaad;
-            background: linear-gradient(135deg, rgba(162, 170, 173, 0.15), rgba(162, 170, 173, 0.04));
-            border-color: rgba(162, 170, 173, 0.25);
+            background: #1e2022;
+            border-color: rgba(162, 170, 173, 0.3);
         }
 
         .btn--ios:hover {
-            background: linear-gradient(135deg, rgba(162, 170, 173, 0.22), rgba(162, 170, 173, 0.08));
-            border-color: rgba(162, 170, 173, 0.5);
+            background: #2a2d30;
+            border-color: rgba(162, 170, 173, 0.55);
             box-shadow: var(--shadow-md), 0 0 30px rgba(162, 170, 173, 0.15);
         }
 
         .btn--android {
             border-left: 3px solid #3DDC84;
-            background: linear-gradient(135deg, rgba(61, 220, 132, 0.15), rgba(61, 220, 132, 0.04));
-            border-color: rgba(61, 220, 132, 0.25);
+            background: #0d2b1a;
+            border-color: rgba(61, 220, 132, 0.3);
         }
 
         .btn--android:hover {
-            background: linear-gradient(135deg, rgba(61, 220, 132, 0.22), rgba(61, 220, 132, 0.08));
-            border-color: rgba(61, 220, 132, 0.5);
+            background: #153d26;
+            border-color: rgba(61, 220, 132, 0.55);
             box-shadow: var(--shadow-md), 0 0 30px rgba(61, 220, 132, 0.2);
         }
 
         .btn--mac {
             border-left: 3px solid var(--accent-primary);
-            background: linear-gradient(135deg, rgba(232, 168, 56, 0.15), rgba(232, 168, 56, 0.04));
-            border-color: rgba(232, 168, 56, 0.25);
+            background: #2a1a06;
+            border-color: rgba(232, 168, 56, 0.3);
         }
 
         .btn--mac:hover {
-            background: linear-gradient(135deg, rgba(232, 168, 56, 0.22), rgba(232, 168, 56, 0.08));
-            border-color: rgba(232, 168, 56, 0.5);
+            background: #3d270a;
+            border-color: rgba(232, 168, 56, 0.55);
             box-shadow: var(--shadow-md), 0 0 30px rgba(232, 168, 56, 0.2);
         }
 
         .btn--windows {
             border-left: 3px solid #0078D4;
-            background: linear-gradient(135deg, rgba(0, 120, 212, 0.15), rgba(0, 120, 212, 0.04));
-            border-color: rgba(0, 120, 212, 0.25);
+            background: #0a1a2e;
+            border-color: rgba(0, 120, 212, 0.3);
         }
 
         .btn--windows:hover {
-            background: linear-gradient(135deg, rgba(0, 120, 212, 0.22), rgba(0, 120, 212, 0.08));
-            border-color: rgba(0, 120, 212, 0.5);
+            background: #0f2640;
+            border-color: rgba(0, 120, 212, 0.55);
             box-shadow: var(--shadow-md), 0 0 30px rgba(0, 120, 212, 0.2);
         }
 
         .btn--cloud {
             border-left: 3px solid var(--accent-tertiary);
-            background: linear-gradient(135deg, rgba(91, 181, 162, 0.18), rgba(91, 181, 162, 0.05));
+            background: #0a1f1a;
             border-color: rgba(91, 181, 162, 0.3);
         }
 
         .btn--cloud:hover {
-            background: linear-gradient(135deg, rgba(91, 181, 162, 0.25), rgba(91, 181, 162, 0.1));
+            background: #0f2e26;
             border-color: rgba(91, 181, 162, 0.55);
             box-shadow: var(--shadow-md), 0 0 30px rgba(91, 181, 162, 0.2);
         }
@@ -887,7 +885,7 @@
                             <i class="fab fa-apple"></i>
                             TestFlight 安装
                         </a>
-                        <a href="https://danboxq.lanzouq.com/iiRPg3pbqbfc" class="btn btn--ios">
+                        <a href="https://danboxq.lanzouq.com/iFx3C3qm62bg" class="btn btn--ios">
                             <i class="fas fa-file-archive"></i>
                             iOS IPA（需自签）
                         </a>
@@ -901,13 +899,31 @@
                         Android 平台
                     </div>
                     <div class="download-grid">
-                        <a href="https://danboxq.lanzouq.com/iTlFT3pbqdrg" class="btn btn--android">
+                        <a href="https://danboxq.lanzouq.com/i50h23qm5wti" class="btn btn--android">
                             <i class="fab fa-android"></i>
                             Android 下载
                         </a>
-                        <a href="https://danboxq.lanzouq.com/iJIda3pbqh8b" class="btn btn--android">
+                        <a href="https://danboxq.lanzouq.com/ixIq83qm5yzg" class="btn btn--android">
                             <i class="fab fa-android"></i>
                             Android 旧设备
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Android TV Group -->
+                <div class="download-group reveal">
+                    <div class="section-label">
+                        <i class="fas fa-tv"></i>
+                        Android TV 平台
+                    </div>
+                    <div class="download-grid">
+                        <a href="https://danboxq.lanzouq.com/i5y1v3qm6ave" class="btn btn--android">
+                            <i class="fas fa-tv"></i>
+                            Android TV 32位
+                        </a>
+                        <a href="https://danboxq.lanzouq.com/iaVu73qm69gd" class="btn btn--android">
+                            <i class="fas fa-tv"></i>
+                            Android TV 64位
                         </a>
                     </div>
                 </div>
@@ -919,15 +935,15 @@
                         桌面平台
                     </div>
                     <div class="download-grid">
-                        <a href="https://danboxq.lanzouq.com/if07V3pbqp7i" class="btn btn--mac">
+                        <a href="https://danboxq.lanzouq.com/igOrW3qm67uf" class="btn btn--mac">
                             <i class="fab fa-apple"></i>
                             macOS Intel
                         </a>
-                        <a href="https://danboxq.lanzouq.com/i48843pbqmtc" class="btn btn--mac">
+                        <a href="https://danboxq.lanzouq.com/ixACN3qm65cf" class="btn btn--mac">
                             <i class="fas fa-microchip"></i>
                             macOS Silicon
                         </a>
-                        <a href="https://danboxq.lanzouq.com/iNVid3pbqqfc" class="btn btn--windows">
+                        <a href="https://danboxq.lanzouq.com/iWAyN3qm6d3e" class="btn btn--windows">
                             <i class="fab fa-windows"></i>
                             Windows
                         </a>
