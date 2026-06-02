@@ -1,192 +1,250 @@
 /**
- * Top-Down Water Ripple Particle Animation
- * Creates a 3D grid of particles that ripple like water from the mouse position
+ * Starfield + Meteor Background
+ * Multi-layer starry sky with twinkling stars & shooting meteors
  */
+(function () {
+  const canvas = document.getElementById('particle-canvas');
+  const ctx = canvas.getContext('2d');
 
-const canvas = document.getElementById('particle-canvas');
-const ctx = canvas.getContext('2d');
+  let width, height;
+  let mouse = { x: 0, y: 0, targetX: 0, targetY: 0 };
+  let stars = [];
+  let meteors = [];
+  let frame = 0;
 
-let width, height;
-let particles = [];
-// Mouse position in 3D grid space (approximate)
-let mouse = { x: 0, y: 0, active: false };
-// Ripple center physics
-let rippleCenter = { x: 0, y: 0, vx: 0, vy: 0 };
-let time = 0;
+  // ─── Config ────────────────────────────────
+  const STAR_COUNT = 280;
+  const LAYERS = [
+    { count: 120, baseSize: 0.6, speed: 0.3, alphaBase: 0.5, distance: 800 },
+    { count: 100, baseSize: 1.2, speed: 0.6, alphaBase: 0.7, distance: 500 },
+    { count:  60, baseSize: 1.8, speed: 1.0, alphaBase: 0.9, distance: 300 },
+  ];
+  const METEOR_INTERVAL_MIN = 3000;
+  const METEOR_INTERVAL_MAX = 8000;
+  let nextMeteor = frame + randomInt(60, 200);
+  const METEOR_COLORS = ['#ffffff', '#ffe9c4', '#d4bfff', '#a0d8ef', '#e8a838'];
 
-// Configuration
-const config = {
-    particleSpacing: 25,
-    rows: 0,
-    cols: 0,
-    waveSpeed: 0.025, // Slower speed (was 0.05)
-    waveAmplitude: 35,
-    waveFrequency: 0.02, // Slightly looser waves
-    focalLength: 300,
-    viewAngle: 0.8,
-    baseY: 100,
-    colors: ['#4facfe', '#00f2fe', '#00d4ff'],
-    // Physics config
-    springStrength: 0.005, // Low strength = heavy feel (slow acceleration)
-    friction: 0.90 // Damping to prevent endless oscillation
-};
+  // ─── Helpers ───────────────────────────────
+  function randomInt(a, b) { return Math.floor(Math.random() * (b - a + 1)) + a; }
+  function randomFloat(a, b) { return Math.random() * (b - a) + a; }
 
-class Particle {
-    constructor(x, z) {
-        this.x = x; // Grid X
-        this.y = 0; // Grid Y (Height)
-        this.z = z; // Grid Z (Depth)
+  // ─── Star ──────────────────────────────────
+  class Star {
+    constructor(layer) {
+      this.layer = layer;
+      this.x = Math.random() * 200 - 100;  // % offset from center
+      this.y = Math.random() * 200 - 100;
+      this.z = layer.distance;
+      this.size = layer.baseSize * randomFloat(0.4, 1.6);
+      this.twinklePhase = randomFloat(0, Math.PI * 2);
+      this.twinkleSpeed = randomFloat(0.008, 0.03);
+      this.twinkleAmp = randomFloat(0.3, 0.7);
+      this.hue = randomFloat(30, 60); // warm white-to-gold range
+    }
 
-        this.ox = x;
-        this.oz = z;
+    draw(ctx, ox, oy, layerSpeed) {
+      // Parallax offset from mouse
+      const px = this.x + ox / this.z * layerSpeed * 40;
+      const py = this.y + oy / this.z * layerSpeed * 40;
 
-        this.size = 1.2;
-        this.color = config.colors[Math.floor(Math.random() * config.colors.length)];
+      // Screen position
+      const sx = width / 2 + (px / 100) * width / 2;
+      const sy = height / 2 + (py / 100) * height / 2;
+
+      if (sx < -10 || sx > width + 10 || sy < -10 || sy > height + 10) return;
+
+      // Twinkle
+      const twinkle = Math.sin(frame * this.twinkleSpeed + this.twinklePhase);
+      const alpha = this.layer.alphaBase + twinkle * this.twinkleAmp;
+      const clampedAlpha = Math.max(0.05, Math.min(1, alpha));
+
+      const distFromCenter = Math.abs(py) / 100; // 0..1
+      const size = this.size * (1 + twinkle * 0.3);
+
+      ctx.beginPath();
+
+      // Bright stars get a glow
+      if (size > 1.5 && clampedAlpha > 0.5) {
+        const glow = ctx.createRadialGradient(sx, sy, 0, sx, sy, size * 3);
+        glow.addColorStop(0, `hsla(${this.hue}, 40%, 90%, ${clampedAlpha * 0.5})`);
+        glow.addColorStop(1, 'transparent');
+        ctx.fillStyle = glow;
+        ctx.arc(sx, sy, size * 3, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      ctx.arc(sx, sy, size, 0, Math.PI * 2);
+      ctx.fillStyle = `hsla(${this.hue}, 20%, ${85 + twinkle * 15}%, ${clampedAlpha})`;
+      ctx.fill();
+    }
+  }
+
+  // ─── Meteor ────────────────────────────────
+  class Meteor {
+    constructor() {
+      this.reset();
+    }
+
+    reset() {
+      // Start from a random edge
+      const edge = randomInt(0, 3);
+      switch (edge) {
+        case 0: // top
+          this.x = randomFloat(0, width);
+          this.y = -20;
+          break;
+        case 1: // right
+          this.x = width + 20;
+          this.y = randomFloat(0, height * 0.6);
+          break;
+        case 2: // bottom
+          this.x = randomFloat(0, width);
+          this.y = height + 20;
+          break;
+        case 3: // left
+          this.x = -20;
+          this.y = randomFloat(0, height * 0.6);
+          break;
+      }
+
+      const angle = randomFloat(-0.8, -0.3); // downward angle
+      const speed = randomFloat(4, 9);
+      this.vx = Math.cos(angle) * speed;
+      this.vy = -Math.sin(angle) * speed;
+      this.len = randomInt(40, 120);
+      this.color = METEOR_COLORS[randomInt(0, METEOR_COLORS.length - 1)];
+      this.life = 1.0;
+      this.decay = randomFloat(0.008, 0.025);
     }
 
     update() {
-        // Calculate distance from the physics-based "ripple center"
-        const dx = this.ox - rippleCenter.x;
-        const dz = this.oz - rippleCenter.y; // rippleCenter.y maps to Z depth
-        const distance = Math.sqrt(dx * dx + dz * dz);
-
-        // Radial Sine Wave Function
-        this.y = Math.sin(distance * config.waveFrequency - time * 2) * config.waveAmplitude;
+      this.x += this.vx;
+      this.y += this.vy;
+      this.life -= this.decay;
     }
 
-    draw() {
-        // 3D Projection with Rotation
-        // Rotate around X axis to get top-down view
-        // y' = y*cos(theta) - z*sin(theta)
-        // z' = y*sin(theta) + z*cos(theta)
+    draw(ctx) {
+      if (this.life <= 0) return;
+      const tailX = this.x - this.vx * this.len;
+      const tailY = this.y - this.vy * this.len;
 
-        const cos = Math.cos(config.viewAngle);
-        const sin = Math.sin(config.viewAngle);
+      const grad = ctx.createLinearGradient(this.x, this.y, tailX, tailY);
+      grad.addColorStop(0, this.color);
+      grad.addColorStop(1, 'transparent');
 
-        const rx = this.x;
-        const ry = this.y * cos - this.z * sin; // Rotated Y
-        const rz = this.y * sin + this.z * cos; // Rotated Z
+      ctx.beginPath();
+      ctx.moveTo(this.x, this.y);
+      ctx.lineTo(tailX, tailY);
+      ctx.strokeStyle = grad;
+      ctx.lineWidth = 1.5 * this.life;
+      ctx.globalAlpha = this.life;
+      ctx.stroke();
+      ctx.globalAlpha = 1;
 
-        // Perspective Projection
-        const depth = config.focalLength + rz + 600; // Push back
-        const scale = config.focalLength / depth;
-
-        if (scale > 0) {
-            const screenX = rx * scale + width / 2;
-            const screenY = (ry + config.baseY) * scale + height / 2;
-
-            // Size attenuation
-            const size = this.size * scale * 2;
-
-            ctx.beginPath();
-            ctx.arc(screenX, screenY, size, 0, Math.PI * 2);
-            ctx.fillStyle = this.color;
-
-            // Depth-based opacity (fog)
-            // Particles further back (higher z) should be dimmer
-            // In our rotated view, 'rz' represents depth
-            let alpha = (1 - (rz + 500) / 2000);
-            alpha = Math.max(0, Math.min(1, alpha));
-
-            ctx.globalAlpha = alpha;
-            ctx.fill();
-            ctx.globalAlpha = 1;
-        }
+      // Head glow
+      if (this.life > 0.3) {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, 2 * this.life, 0, Math.PI * 2);
+        ctx.fillStyle = this.color;
+        ctx.globalAlpha = this.life * 0.7;
+        ctx.fill();
+        ctx.globalAlpha = 1;
+      }
     }
-}
+  }
 
-function init() {
-    resize();
-    createParticles();
-    animate();
-}
+  // ─── Setup ─────────────────────────────────
+  function createStars() {
+    stars = [];
+    LAYERS.forEach((layer) => {
+      for (let i = 0; i < layer.count; i++) {
+        stars.push(new Star(layer));
+      }
+    });
+  }
 
-function resize() {
+  function resize() {
     width = canvas.width = window.innerWidth;
     height = canvas.height = window.innerHeight;
+  }
 
-    // Grid needs to be larger than screen to cover rotation gaps
-    config.cols = Math.ceil(width / config.particleSpacing) + 30;
-    config.rows = Math.ceil(height / config.particleSpacing) + 30;
-}
-
-function createParticles() {
-    particles = [];
-
-    const startX = -(config.cols * config.particleSpacing) / 2;
-    const startZ = -(config.rows * config.particleSpacing) / 2;
-
-    for (let i = 0; i < config.cols; i++) {
-        for (let j = 0; j < config.rows; j++) {
-            const x = startX + i * config.particleSpacing;
-            const z = startZ + j * config.particleSpacing;
-            particles.push(new Particle(x, z));
-        }
-    }
-}
-
-function animate() {
+  // ─── Animation Loop ────────────────────────
+  function animate() {
     ctx.clearRect(0, 0, width, height);
 
-    time += config.waveSpeed;
+    // Dark background gradient
+    const bgGrad = ctx.createRadialGradient(width / 2, height * 0.4, 0, width / 2, height / 2, Math.max(width, height));
+    bgGrad.addColorStop(0, '#0d0d18');
+    bgGrad.addColorStop(1, '#05050a');
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(0, 0, width, height);
 
-    // Update Ripple Center Physics
-    // Target is mouse if active, or a wandering point if idle
-    let targetX = mouse.active ? mouse.x : Math.sin(time * 0.5) * 200;
-    let targetY = mouse.active ? mouse.y : Math.cos(time * 0.5) * 200;
+    // Subtle nebula glow
+    const nx = width * 0.65 + (mouse.x / width * 100);
+    const ny = height * 0.3 + (mouse.y / height * 60);
+    const ng = ctx.createRadialGradient(nx, ny, 0, nx, ny, Math.min(width, height) * 0.5);
+    ng.addColorStop(0, 'rgba(30, 20, 60, 0.12)');
+    ng.addColorStop(0.5, 'rgba(20, 10, 40, 0.04)');
+    ng.addColorStop(1, 'transparent');
+    ctx.fillStyle = ng;
+    ctx.fillRect(0, 0, width, height);
 
-    // Spring force: F = (target - current) * k
-    const fx = (targetX - rippleCenter.x) * config.springStrength;
-    const fy = (targetY - rippleCenter.y) * config.springStrength;
+    const n2x = width * 0.3 - (mouse.x / width * 80);
+    const n2y = height * 0.7 - (mouse.y / height * 40);
+    const ng2 = ctx.createRadialGradient(n2x, n2y, 0, n2x, n2y, Math.min(width, height) * 0.35);
+    ng2.addColorStop(0, 'rgba(40, 25, 15, 0.08)');
+    ng2.addColorStop(1, 'transparent');
+    ctx.fillStyle = ng2;
+    ctx.fillRect(0, 0, width, height);
 
-    // Acceleration: v += F
-    rippleCenter.vx += fx;
-    rippleCenter.vy += fy;
+    // Draw stars
+    const ox = mouse.x - width / 2;
+    const oy = mouse.y - height / 2;
+    stars.forEach(s => s.draw(ctx, ox, oy, s.layer.speed));
 
-    // Friction: v *= friction
-    rippleCenter.vx *= config.friction;
-    rippleCenter.vy *= config.friction;
+    // Meteors
+    if (frame >= nextMeteor) {
+      meteors.push(new Meteor());
+      nextMeteor = frame + randomInt(METEOR_INTERVAL_MIN / 16, METEOR_INTERVAL_MAX / 16);
+      // Occasionally spawn a pair
+      if (Math.random() < 0.3) {
+        meteors.push(new Meteor());
+      }
+    }
 
-    // Position: p += v
-    rippleCenter.x += rippleCenter.vx;
-    rippleCenter.y += rippleCenter.vy;
+    for (let i = meteors.length - 1; i >= 0; i--) {
+      meteors[i].update();
+      if (meteors[i].life <= 0) {
+        meteors.splice(i, 1);
+      } else {
+        meteors[i].draw(ctx);
+      }
+    }
 
-    // Sort by depth (Rotated Z) for correct occlusion
-    // We need to calculate rotated Z for sorting
-    const sin = Math.sin(config.viewAngle);
-    const cos = Math.cos(config.viewAngle);
+    // Limit max meteors
+    if (meteors.length > 6) meteors.splice(0, meteors.length - 6);
 
-    particles.sort((a, b) => {
-        const az = a.y * sin + a.z * cos;
-        const bz = b.y * sin + b.z * cos;
-        return bz - az;
-    });
+    // Smooth mouse interpolation
+    mouse.x += (mouse.targetX - mouse.x) * 0.05;
+    mouse.y += (mouse.targetY - mouse.y) * 0.05;
 
-    particles.forEach(particle => {
-        particle.update();
-        particle.draw();
-    });
-
+    frame++;
     requestAnimationFrame(animate);
-}
+  }
 
-// Event Listeners
-window.addEventListener('resize', () => {
-    resize();
-    createParticles();
-});
+  // ─── Events ────────────────────────────────
+  window.addEventListener('resize', () => { resize(); createStars(); });
+  window.addEventListener('mousemove', (e) => {
+    mouse.targetX = e.clientX;
+    mouse.targetY = e.clientY;
+  });
+  window.addEventListener('mouseout', () => {
+    mouse.targetX = width / 2;
+    mouse.targetY = height / 2;
+  });
 
-window.addEventListener('mousemove', (e) => {
-    mouse.active = true;
-    // Map screen coordinates to 3D grid coordinates (Rough approximation)
-    // Center is (0,0)
-    mouse.x = (e.clientX - width / 2) * 2;
-    mouse.y = (e.clientY - height / 2) * 2; // In top-down view, screen Y maps to Z
-});
-
-window.addEventListener('mouseout', () => {
-    mouse.active = false;
-});
-
-// Start
-init();
+  // Init
+  resize();
+  createStars();
+  animate();
+})();

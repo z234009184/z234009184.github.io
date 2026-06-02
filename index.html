@@ -279,15 +279,17 @@
             font-weight: 400;
             letter-spacing: 0.08em;
             margin-bottom: var(--space-6);
+            text-align: center;
         }
 
         /* Description */
         .hero-description {
             max-width: 560px;
+            margin: 0 auto var(--space-12);
             font-size: clamp(1rem, 2vw, 1.15rem);
             color: var(--text-secondary);
             line-height: 1.9;
-            margin-bottom: var(--space-12);
+            text-align: center;
         }
 
         .hero-description em {
@@ -301,7 +303,7 @@
            ============================================ */
         .app-preview {
             position: relative;
-            margin-bottom: var(--space-16);
+            margin: 0 auto var(--space-16);
             max-width: 720px;
             width: 100%;
         }
@@ -742,6 +744,300 @@
         }
 
         /* ============================================
+           TUTORIAL SECTION
+           ============================================ */
+        .tutorial-section {
+            padding: var(--space-16) 0 var(--space-24);
+        }
+
+        .tutorial-header {
+            text-align: center;
+            margin-bottom: var(--space-12);
+        }
+
+        .tutorial-header h2 {
+            font-size: clamp(1.5rem, 3vw, 2rem);
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            margin-bottom: var(--space-3);
+        }
+
+        .tutorial-header p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* Platform Tab Switcher */
+        .tutorial-tabs {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: var(--space-2);
+            padding-bottom: var(--space-4);
+            margin-bottom: var(--space-8);
+            border-bottom: 1px solid var(--border-subtle);
+            position: relative;
+        }
+
+        .tutorial-tab {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            padding: var(--space-3) var(--space-5);
+            background: transparent;
+            border: none;
+            border-radius: var(--radius-md);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 500;
+            font-family: var(--font-sans);
+            cursor: pointer;
+            transition: all var(--duration-normal) var(--ease-out);
+            white-space: nowrap;
+            position: relative;
+        }
+
+        .tutorial-tab i {
+            font-size: 1rem;
+            transition: transform var(--duration-fast) var(--ease-spring);
+        }
+
+        .tutorial-tab:hover {
+            color: var(--text-primary);
+            background: var(--surface-glass-hover);
+        }
+
+        .tutorial-tab:hover i {
+            transform: translateY(-1px);
+        }
+
+        .tutorial-tab.active {
+            color: var(--accent-primary);
+            background: rgba(232, 168, 56, 0.08);
+        }
+
+        /* Sliding active indicator */
+        .tutorial-tab-indicator {
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            height: 2px;
+            background: var(--accent-primary);
+            border-radius: 1px;
+            transition: left var(--duration-normal) var(--ease-out),
+                        width var(--duration-normal) var(--ease-out);
+            pointer-events: none;
+        }
+
+        /* Tutorial Panels */
+        .tutorial-panel {
+            display: none;
+        }
+
+        .tutorial-panel.active {
+            display: block;
+            animation: fadeInPanel 0.45s var(--ease-out) forwards;
+        }
+
+        @keyframes fadeInPanel {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Tutorial Steps Grid */
+        .tutorial-steps {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: var(--space-4);
+        }
+
+        @media (min-width: 769px) {
+            .tutorial-steps {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Tutorial Step Card */
+        .tutorial-step {
+            position: relative;
+            padding: var(--space-6);
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            transition: all var(--duration-normal) var(--ease-out);
+            overflow: hidden;
+        }
+
+        .tutorial-step::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-primary), transparent);
+            opacity: 0;
+            transition: opacity var(--duration-normal) var(--ease-out);
+        }
+
+        .tutorial-step:hover {
+            transform: translateY(-2px);
+            border-color: var(--border-medium);
+            box-shadow: var(--shadow-md);
+        }
+
+        .tutorial-step:hover::after {
+            opacity: 0.5;
+        }
+
+        .step-number {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(232, 168, 56, 0.12);
+            border: 1px solid rgba(232, 168, 56, 0.3);
+            color: var(--accent-primary);
+            font-weight: 700;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: var(--space-3);
+            flex-shrink: 0;
+        }
+
+        .step-content h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: var(--space-2);
+            color: var(--text-primary);
+        }
+
+        .step-content p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.75;
+        }
+
+        .step-tip {
+            background: rgba(232, 168, 56, 0.05);
+            border-left: 2px solid var(--accent-primary);
+            padding: var(--space-3) var(--space-4);
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: var(--space-3);
+            line-height: 1.6;
+        }
+
+        .step-tip i {
+            margin-right: var(--space-2);
+            color: var(--accent-primary);
+            opacity: 0.8;
+        }
+
+        .step-list {
+            padding-left: var(--space-4);
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.85;
+            margin-top: var(--space-2);
+        }
+
+        .step-list li {
+            margin-bottom: var(--space-1);
+        }
+
+        .step-list strong {
+            color: var(--accent-primary);
+            font-weight: 600;
+        }
+
+        /* FAQ Accordion */
+        .tutorial-faq {
+            margin-top: var(--space-16);
+        }
+
+        .tutorial-faq h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: var(--space-8);
+            text-align: center;
+            color: var(--text-primary);
+        }
+
+        .faq-list {
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        .faq-item {
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .faq-question {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: var(--space-4);
+            padding: var(--space-4) var(--space-2);
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            font-weight: 500;
+            font-family: var(--font-sans);
+            text-align: left;
+            cursor: pointer;
+            transition: color var(--duration-fast) var(--ease-out);
+            line-height: 1.5;
+        }
+
+        .faq-question:hover {
+            color: var(--accent-primary);
+        }
+
+        .faq-question i {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            transition: transform var(--duration-normal) var(--ease-out);
+            flex-shrink: 0;
+        }
+
+        .faq-item.open .faq-question {
+            color: var(--accent-primary);
+        }
+
+        .faq-item.open .faq-question i {
+            transform: rotate(180deg);
+            color: var(--accent-primary);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s var(--ease-out);
+            padding: 0 var(--space-2);
+        }
+
+        .faq-answer p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            padding-bottom: var(--space-4);
+        }
+
+        .faq-item.open .faq-answer {
+            max-height: 500px;
+        }
+
+        /* ============================================
            RESPONSIVE
            ============================================ */
         @media (max-width: 768px) {
@@ -787,6 +1083,33 @@
 
             .app-preview-chrome {
                 display: none;
+            }
+
+            .tutorial-tabs {
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+                justify-content: flex-start;
+                padding-bottom: var(--space-2);
+            }
+
+            .tutorial-tabs::-webkit-scrollbar {
+                display: none;
+            }
+
+            .tutorial-tab {
+                flex-shrink: 0;
+                font-size: 0.8rem;
+                padding: var(--space-2) var(--space-3);
+            }
+
+            .tutorial-steps {
+                grid-template-columns: 1fr !important;
+            }
+
+            .tutorial-step {
+                padding: var(--space-4);
             }
         }
 
@@ -834,6 +1157,7 @@
             <div class="navbar-links">
                 <a href="#download">下载</a>
                 <a href="#quotes">语录</a>
+                <a href="#tutorial">安装教程</a>
             </div>
         </nav>
 
@@ -953,6 +1277,249 @@
                             <i class="fas fa-folder-open"></i>
                             网盘地址
                         </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== TUTORIAL SECTION ========== -->
+        <section class="tutorial-section" id="tutorial">
+            <div class="container">
+                <div class="tutorial-header reveal">
+                    <h2>安装教程</h2>
+                    <p>各平台详细安装指南，快速解决安装问题</p>
+                </div>
+
+                <div class="tutorial-tabs reveal">
+                    <div class="tutorial-tab-indicator"></div>
+                    <button class="tutorial-tab active" data-platform="ios">
+                        <i class="fab fa-apple"></i> iOS
+                    </button>
+                    <button class="tutorial-tab" data-platform="android">
+                        <i class="fab fa-android"></i> Android
+                    </button>
+                    <button class="tutorial-tab" data-platform="tv">
+                        <i class="fas fa-tv"></i> 电视
+                    </button>
+                    <button class="tutorial-tab" data-platform="desktop">
+                        <i class="fas fa-desktop"></i> 桌面
+                    </button>
+                </div>
+
+                <!-- iOS Panel -->
+                <div class="tutorial-panel active" data-platform="ios">
+                    <div class="tutorial-steps">
+                        <div class="tutorial-step reveal">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h4>安装 TestFlight</h4>
+                                <p>前往 App Store 搜索并安装 <strong>TestFlight</strong>。这是 Apple 官方的 Beta 测试平台，用于安装测试版应用。</p>
+                                <div class="step-tip"><i class="fas fa-lightbulb"></i> 如果已安装 TestFlight，请确保更新到最新版本。</div>
+                            </div>
+                        </div>
+                        <div class="tutorial-step reveal">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h4>点击下载链接</h4>
+                                <p>在本页面点击 <strong>TestFlight 安装</strong> 按钮，系统会自动跳转到 TestFlight 应用并显示应用详情。</p>
+                                <div class="step-tip"><i class="fas fa-exclamation-triangle"></i> 请使用 Safari 浏览器打开，微信/QQ 内置浏览器可能无法跳转。</div>
+                            </div>
+                        </div>
+                        <div class="tutorial-step reveal">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h4>接受测试邀请</h4>
+                                <p>在 TestFlight 中点击 <strong>"接受"</strong> 按钮，同意加入 Beta 测试计划。</p>
+                            </div>
+                        </div>
+                        <div class="tutorial-step reveal">
+                            <div class="step-number">4</div>
+                            <div class="step-content">
+                                <h4>开始安装</h4>
+                                <p>点击 <strong>"安装"</strong> 按钮，应用将自动下载并安装到你的 iPhone/iPad 上。安装完成后即可在主屏幕找到应用图标。</p>
+                            </div>
+                        </div>
+                        <div class="tutorial-step reveal">
+                            <div class="step-number">5</div>
+                            <div class="step-content">
+                                <h4>首次打开与信任证书</h4>
+                                <p>打开应用时，系统可能提示"未受信任的企业级开发者"。前往 <strong>设置 → 通用 → VPN与设备管理</strong>，找到对应证书点击信任即可。</p>
+                                <div class="step-tip"><i class="fas fa-lightbulb"></i> 如果 TestFlight 显示"无法安装"，请尝试切换 Wi-Fi/蜂窝网络或重新安装 TestFlight。</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Android Panel -->
+                <div class="tutorial-panel" data-platform="android">
+                    <div class="tutorial-steps">
+                        <div class="tutorial-step reveal">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h4>使用浏览器打开</h4>
+                                <p>复制下载链接，在手机自带的浏览器（Chrome / Edge / 系统浏览器）中打开。微信和 QQ 内置浏览器会拦截 APK 下载。</p>
+                                <div class="step-tip"><i class="fas fa-lightbulb"></i> 建议用相机或扫码工具扫描下载二维码，在浏览器中打开。</div>
+                            </div>
+                        </div>
+                        <div class="tutorial-step reveal">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h4>点击下载 APK</h4>
+                                <p>点击 <strong>Android 下载</strong> 按钮，浏览器会提示下载 APK 文件，等待下载完成。</p>
+                            </div>
+                        </div>
+                        <div class="tutorial-step reveal">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h4>各品牌手机安装设置</h4>
+                                <p>Android 手机安装 APK 前，需要根据你的手机品牌允许"安装未知应用"：</p>
+                                <ul class="step-list">
+                                    <li><strong>华为/鸿蒙</strong>：设置 → 系统和更新 → 纯净模式 → 关闭</li>
+                                    <li><strong>小米/HyperOS</strong>：设置 → 隐私保护 → 特殊权限 → 安装未知应用 → 允许浏览器</li>
+                                    <li><strong>OPPO/一加</strong>：设置 → 安全 → 安装未知应用 → 允许浏览器</li>
+                                    <li><strong>vivo</strong>：设置 → 安全 → 更多安全设置 → 允许安装未知应用</li>
+                                    <li><strong>三星</strong>：设置 → 应用程序 → 右上角 ⋮ → 特殊访问 → 安装未知应用</li>
+                                    <li><strong>其他品牌</strong>：设置中搜索"未知来源"或"安装未知应用"</li>
+                                </ul>
+                                <div class="step-tip"><i class="fas fa-shield-alt"></i> 安装时若弹出安全提醒，选择"继续安装"或"忽略风险"即可。</div>
+                            </div>
+                        </div>
+                        <div class="tutorial-step reveal">
+                            <div class="step-number">4</div>
+                            <div class="step-content">
+                                <h4>完成安装</h4>
+                                <p>在通知栏或文件管理中点击已下载的 APK 文件，按提示完成安装。安装后即可在主屏幕找到应用图标。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TV Panel -->
+                <div class="tutorial-panel" data-platform="tv">
+                    <div class="tutorial-steps">
+                        <div class="tutorial-step reveal">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h4>方法一：U 盘安装（推荐）</h4>
+                                <p>在电脑上下载 APK 文件并复制到 U 盘中，将 U 盘插入电视或盒子的 USB 接口。</p>
+                            </div>
+                        </div>
+                        <div class="tutorial-step reveal">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h4>通过文件管理器安装</h4>
+                                <p>在电视上打开"文件管理"或"U 盘助手"，找到 U 盘中的 APK 文件点击安装。如果提示禁止安装，请在设置中允许"未知来源"。</p>
+                                <div class="step-tip"><i class="fas fa-lightbulb"></i> 部分电视（小米、海信等）可在"设置 → 账号与安全"中开启"允许安装未知来源应用"。</div>
+                            </div>
+                        </div>
+                        <div class="tutorial-step reveal">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h4>方法二：局域网传输</h4>
+                                <p>在电视和手机/电脑上使用同一款文件传输工具（如"当贝市场"、"快传助手"、"ES 文件浏览器"），通过局域网将 APK 文件传输到电视上安装。</p>
+                            </div>
+                        </div>
+                        <div class="tutorial-step reveal">
+                            <div class="step-number">4</div>
+                            <div class="step-content">
+                                <h4>方法三：浏览器直接下载</h4>
+                                <p>如果电视自带浏览器，直接在浏览器访问本页面，通过网盘地址下载对应 APK 并安装。</p>
+                                <div class="step-tip"><i class="fas fa-exclamation-triangle"></i> 部分 TV 系统限制安装第三方应用，需先开启"ADB 调试"或"开发者模式"。</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Desktop Panel -->
+                <div class="tutorial-panel" data-platform="desktop">
+                    <div class="tutorial-steps">
+                        <div class="tutorial-step reveal">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h4>macOS 安装</h4>
+                                <p>下载对应你 Mac 芯片的版本：Apple Silicon（M1/M2/M3/M4）选 <strong>macOS Silicon</strong>，Intel 芯片选 <strong>macOS Intel</strong>。</p>
+                                <p style="margin-top: var(--space-2);">打开下载的 <strong>.dmg</strong> 文件，将应用拖入"应用程序"文件夹即可。</p>
+                            </div>
+                        </div>
+                        <div class="tutorial-step reveal">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h4>macOS 首次打开提示</h4>
+                                <p>若提示"无法验证开发者"，请执行以下任一方法：</p>
+                                <ol class="step-list">
+                                    <li>打开 <strong>系统设置 → 隐私与安全性</strong>，找到被阻止应用，点击"仍要打开"</li>
+                                    <li>或：在 Finder 中右键点击应用 → 选择"打开" → 再次确认</li>
+                                </ol>
+                                <div class="step-tip"><i class="fas fa-lightbulb"></i> 此操作仅需一次，之后打开不再提示。</div>
+                            </div>
+                        </div>
+                        <div class="tutorial-step reveal">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h4>Windows 安装</h4>
+                                <p>下载 Windows 版本的 .exe 安装文件，双击运行即可开始安装。</p>
+                            </div>
+                        </div>
+                        <div class="tutorial-step reveal">
+                            <div class="step-number">4</div>
+                            <div class="step-content">
+                                <h4>Windows 安全提示处理</h4>
+                                <p>若弹出"Windows 已保护你的电脑"，请：点击 <strong>"更多信息"</strong> → 点击 <strong>"仍要运行"</strong> 即可继续。</p>
+                                <div class="step-tip"><i class="fas fa-shield-alt"></i> 本提示因应用未在 Microsoft Store 上架产生，属正常现象。本站所有文件均经安全校验。</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ -->
+                <div class="tutorial-faq reveal">
+                    <h3>常见问题</h3>
+                    <div class="faq-list">
+                        <div class="faq-item">
+                            <button class="faq-question">
+                                <span>为什么在微信里无法直接安装？</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <div class="faq-answer">
+                                <p>微信和 QQ 内置浏览器会拦截 APK 下载和第三方应用跳转。请复制链接在手机自带浏览器（Safari / Chrome / Edge）中打开，或使用相机扫描二维码在浏览器中打开。</p>
+                            </div>
+                        </div>
+                        <div class="faq-item">
+                            <button class="faq-question">
+                                <span>TestFlight 显示"无法安装"或名额已满？</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <div class="faq-answer">
+                                <p>可能原因：1) TestFlight 测试名额已满，可稍后再试或联系开发者增加名额；2) 网络不稳定，尝试切换 Wi-Fi/蜂窝网络；3) TestFlight 版本过旧，请前往 App Store 更新后再试。</p>
+                            </div>
+                        </div>
+                        <div class="faq-item">
+                            <button class="faq-question">
+                                <span>安装时提示"发现风险"或"禁止安装"怎么办？</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <div class="faq-answer">
+                                <p>手机系统默认拦截非应用商店来源的应用。请在弹窗提示中选择"允许"或进入设置开启"安装未知应用"权限。不同品牌操作路径不同，请参考上方 Android 教程第 3 步。</p>
+                            </div>
+                        </div>
+                        <div class="faq-item">
+                            <button class="faq-question">
+                                <span>应用是否安全？会不会盗取隐私？</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <div class="faq-answer">
+                                <p>本站所有安装包均经过官方签名校验和完整性验证。建议仅从本页面下载以确保安全。该应用仅用于技术学习研究，非商业用途，请下载后 24 小时内删除。</p>
+                            </div>
+                        </div>
+                        <div class="faq-item">
+                            <button class="faq-question">
+                                <span>电视安装后找不到应用图标？</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <div class="faq-answer">
+                                <p>部分电视系统（小米 TV、乐视等）会将第三方应用放在二级菜单。请在"全部应用"或"我的应用"中查找，也可安装第三方桌面启动器（如"当贝桌面"）更方便找到应用。</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1189,6 +1756,74 @@
                 if (appImage) {
                     appImage.style.transform = `translate(${moveX}px, ${moveY}px) scale(1)`;
                 }
+            });
+
+            // ========== Tutorial Tab Switching ==========
+            const tutorialTabs = document.querySelectorAll('.tutorial-tab');
+            const tutorialPanels = document.querySelectorAll('.tutorial-panel');
+            const tabIndicator = document.querySelector('.tutorial-tab-indicator');
+
+            function updateTabIndicator(tab) {
+                if (!tabIndicator || !tab) return;
+                const tabsRect = tab.parentElement.getBoundingClientRect();
+                const tabRect = tab.getBoundingClientRect();
+                tabIndicator.style.left = (tabRect.left - tabsRect.left) + 'px';
+                tabIndicator.style.width = tabRect.width + 'px';
+            }
+
+            // Initialize indicator position
+            const activeTabEl = document.querySelector('.tutorial-tab.active');
+            if (activeTabEl) {
+                updateTabIndicator(activeTabEl);
+            }
+
+            tutorialTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const platform = tab.dataset.platform;
+
+                    tutorialTabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+
+                    updateTabIndicator(tab);
+
+                    tutorialPanels.forEach(panel => {
+                        panel.classList.remove('active');
+                        if (panel.dataset.platform === platform) {
+                            panel.classList.add('active');
+                            // Re-trigger reveal animations inside the newly active panel
+                            panel.querySelectorAll('.reveal:not(.visible)').forEach(el => {
+                                observer.observe(el);
+                            });
+                        }
+                    });
+                });
+            });
+
+            // Update indicator on window resize
+            window.addEventListener('resize', () => {
+                const active = document.querySelector('.tutorial-tab.active');
+                if (active) updateTabIndicator(active);
+            });
+
+            // ========== FAQ Accordion ==========
+            document.querySelectorAll('.faq-question').forEach(question => {
+                question.addEventListener('click', () => {
+                    const faqItem = question.parentElement;
+                    const isOpen = faqItem.classList.contains('open');
+
+                    document.querySelectorAll('.faq-item.open').forEach(item => {
+                        item.classList.remove('open');
+                    });
+
+                    if (!isOpen) {
+                        faqItem.classList.add('open');
+                    }
+                });
+            });
+
+            // ========== Observe Tutorial Elements ==========
+            document.querySelectorAll('.tutorial-section .reveal, .tutorial-panel .reveal').forEach(el => {
+                observer.observe(el);
             });
         });
 
