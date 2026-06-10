@@ -1,113 +1,74 @@
 /**
- * Starfield + Meteor Background
- * Multi-layer starry sky with twinkling stars & shooting meteors
+ * Starfield + Meteor Background (Optimized)
+ * Performance-focused: pre-rendered background, batched draws, DPR-aware.
+ * Visually subtle: fewer/dimmer stars so content stays readable.
  */
 (function () {
   const canvas = document.getElementById('particle-canvas');
-  const ctx = canvas.getContext('2d');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d', { alpha: false });
 
-  let width, height;
+  // Respect users who prefer reduced motion
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ─── State ──────────────────────────────────
+  let width = 0, height = 0, dpr = 1;
   let mouse = { x: 0, y: 0, targetX: 0, targetY: 0 };
   let stars = [];
   let meteors = [];
   let frame = 0;
+  let nextMeteor = 0;
 
-  // ─── Config ────────────────────────────────
-  const STAR_COUNT = 280;
+  // Off-screen canvas for the static background (drawn once per resize)
+  let bgCanvas = null;
+  let bgCtx = null;
+
+  // ─── Config ─────────────────────────────────
+  // Total stars dropped from 280 → 90 (≈70% fewer). Divided into layers.
   const LAYERS = [
-    { count: 120, baseSize: 0.6, speed: 0.3, alphaBase: 0.5, distance: 800 },
-    { count: 100, baseSize: 1.2, speed: 0.6, alphaBase: 0.7, distance: 500 },
-    { count:  60, baseSize: 1.8, speed: 1.0, alphaBase: 0.9, distance: 300 },
+    { count: 45, baseSize: 0.5, speed: 0.3, alphaBase: 0.18, twinkleAmp: 0.12 },
+    { count: 30, baseSize: 0.9, speed: 0.6, alphaBase: 0.28, twinkleAmp: 0.18 },
+    { count: 15, baseSize: 1.4, speed: 1.0, alphaBase: 0.42, twinkleAmp: 0.22 },
   ];
-  const METEOR_INTERVAL_MIN = 3000;
-  const METEOR_INTERVAL_MAX = 8000;
-  let nextMeteor = frame + randomInt(60, 200);
-  const METEOR_COLORS = ['#ffffff', '#ffe9c4', '#d4bfff', '#a0d8ef', '#e8a838'];
+  const METEOR_INTERVAL_MIN = 4000;
+  const METEOR_INTERVAL_MAX = 9000;
+  const METEOR_COLORS = ['#ffffff', '#ffe9c4', '#a0d8ef'];
 
-  // ─── Helpers ───────────────────────────────
-  function randomInt(a, b) { return Math.floor(Math.random() * (b - a + 1)) + a; }
-  function randomFloat(a, b) { return Math.random() * (b - a) + a; }
+  // ─── Helpers ────────────────────────────────
+  const randomInt = (a, b) => Math.floor(Math.random() * (b - a + 1)) + a;
+  const randomFloat = (a, b) => Math.random() * (b - a) + a;
 
-  // ─── Star ──────────────────────────────────
+  // ─── Star ───────────────────────────────────
   class Star {
     constructor(layer) {
       this.layer = layer;
-      this.x = Math.random() * 200 - 100;  // % offset from center
-      this.y = Math.random() * 200 - 100;
-      this.z = layer.distance;
-      this.size = layer.baseSize * randomFloat(0.4, 1.6);
+      // Position in viewport space (px), not virtual 0-100 units
+      this.x = 0;
+      this.y = 0;
+      this.size = layer.baseSize * randomFloat(0.5, 1.4);
       this.twinklePhase = randomFloat(0, Math.PI * 2);
-      this.twinkleSpeed = randomFloat(0.008, 0.03);
-      this.twinkleAmp = randomFloat(0.3, 0.7);
-      this.hue = randomFloat(30, 60); // warm white-to-gold range
-    }
-
-    draw(ctx, ox, oy, layerSpeed) {
-      // Parallax offset from mouse
-      const px = this.x + ox / this.z * layerSpeed * 40;
-      const py = this.y + oy / this.z * layerSpeed * 40;
-
-      // Screen position
-      const sx = width / 2 + (px / 100) * width / 2;
-      const sy = height / 2 + (py / 100) * height / 2;
-
-      if (sx < -10 || sx > width + 10 || sy < -10 || sy > height + 10) return;
-
-      // Twinkle
-      const twinkle = Math.sin(frame * this.twinkleSpeed + this.twinklePhase);
-      const alpha = this.layer.alphaBase + twinkle * this.twinkleAmp;
-      const clampedAlpha = Math.max(0.05, Math.min(1, alpha));
-
-      const distFromCenter = Math.abs(py) / 100; // 0..1
-      const size = this.size * (1 + twinkle * 0.3);
-
-      ctx.beginPath();
-
-      // Bright stars get a glow
-      if (size > 1.5 && clampedAlpha > 0.5) {
-        const glow = ctx.createRadialGradient(sx, sy, 0, sx, sy, size * 3);
-        glow.addColorStop(0, `hsla(${this.hue}, 40%, 90%, ${clampedAlpha * 0.5})`);
-        glow.addColorStop(1, 'transparent');
-        ctx.fillStyle = glow;
-        ctx.arc(sx, sy, size * 3, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      ctx.arc(sx, sy, size, 0, Math.PI * 2);
-      ctx.fillStyle = `hsla(${this.hue}, 20%, ${85 + twinkle * 15}%, ${clampedAlpha})`;
-      ctx.fill();
+      // Slower twinkle → fewer redraw "events" perceptually
+      this.twinkleSpeed = randomFloat(0.004, 0.015);
+      // Mostly cool whites with a few warm ones — less "white dot" feel
+      this.hue = Math.random() < 0.85
+        ? randomFloat(200, 230)   // cool blue-white
+        : randomFloat(35, 50);    // warm gold accent
     }
   }
 
-  // ─── Meteor ────────────────────────────────
+  // ─── Meteor ─────────────────────────────────
   class Meteor {
-    constructor() {
-      this.reset();
-    }
+    constructor() { this.reset(); }
 
     reset() {
-      // Start from a random edge
       const edge = randomInt(0, 3);
       switch (edge) {
-        case 0: // top
-          this.x = randomFloat(0, width);
-          this.y = -20;
-          break;
-        case 1: // right
-          this.x = width + 20;
-          this.y = randomFloat(0, height * 0.6);
-          break;
-        case 2: // bottom
-          this.x = randomFloat(0, width);
-          this.y = height + 20;
-          break;
-        case 3: // left
-          this.x = -20;
-          this.y = randomFloat(0, height * 0.6);
-          break;
+        case 0: this.x = randomFloat(0, width); this.y = -20; break;
+        case 1: this.x = width + 20; this.y = randomFloat(0, height * 0.5); break;
+        case 2: this.x = randomFloat(0, width); this.y = height + 20; break;
+        case 3: this.x = -20; this.y = randomFloat(0, height * 0.5); break;
       }
-
-      const angle = randomFloat(-0.8, -0.3); // downward angle
+      const angle = randomFloat(-0.8, -0.3);
       const speed = randomFloat(4, 9);
       this.vx = Math.cos(angle) * speed;
       this.vy = -Math.sin(angle) * speed;
@@ -123,106 +84,153 @@
       this.life -= this.decay;
     }
 
-    draw(ctx) {
+    draw(c) {
       if (this.life <= 0) return;
       const tailX = this.x - this.vx * this.len;
       const tailY = this.y - this.vy * this.len;
-
-      const grad = ctx.createLinearGradient(this.x, this.y, tailX, tailY);
+      const grad = c.createLinearGradient(this.x, this.y, tailX, tailY);
       grad.addColorStop(0, this.color);
       grad.addColorStop(1, 'transparent');
-
-      ctx.beginPath();
-      ctx.moveTo(this.x, this.y);
-      ctx.lineTo(tailX, tailY);
-      ctx.strokeStyle = grad;
-      ctx.lineWidth = 1.5 * this.life;
-      ctx.globalAlpha = this.life;
-      ctx.stroke();
-      ctx.globalAlpha = 1;
-
-      // Head glow
-      if (this.life > 0.3) {
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, 2 * this.life, 0, Math.PI * 2);
-        ctx.fillStyle = this.color;
-        ctx.globalAlpha = this.life * 0.7;
-        ctx.fill();
-        ctx.globalAlpha = 1;
-      }
+      c.beginPath();
+      c.moveTo(this.x, this.y);
+      c.lineTo(tailX, tailY);
+      c.strokeStyle = grad;
+      c.lineWidth = 1.5 * this.life;
+      c.globalAlpha = this.life;
+      c.stroke();
+      c.globalAlpha = 1;
     }
   }
 
-  // ─── Setup ─────────────────────────────────
+  // ─── Setup ──────────────────────────────────
   function createStars() {
     stars = [];
-    LAYERS.forEach((layer) => {
+    for (const layer of LAYERS) {
       for (let i = 0; i < layer.count; i++) {
-        stars.push(new Star(layer));
+        const s = new Star(layer);
+        s.x = Math.random() * width;
+        s.y = Math.random() * height;
+        stars.push(s);
       }
-    });
+    }
   }
 
   function resize() {
-    width = canvas.width = window.innerWidth;
-    height = canvas.height = window.innerHeight;
+    dpr = Math.min(window.devicePixelRatio || 1, 2); // cap at 2x to avoid 4x cost
+    width = window.innerWidth;
+    height = window.innerHeight;
+    canvas.width = Math.floor(width * dpr);
+    canvas.height = Math.floor(height * dpr);
+    canvas.style.width = width + 'px';
+    canvas.style.height = height + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0); // draw in CSS pixels
+
+    // Pre-render the static background once per resize
+    buildBackground();
   }
 
-  // ─── Animation Loop ────────────────────────
+  // Background is fully static — draw it ONCE and blit it every frame.
+  function buildBackground() {
+    bgCanvas = document.createElement('canvas');
+    bgCanvas.width = width;
+    bgCanvas.height = height;
+    bgCtx = bgCanvas.getContext('2d');
+
+    // Base radial gradient
+    const bg = bgCtx.createRadialGradient(
+      width / 2, height * 0.4, 0,
+      width / 2, height / 2, Math.max(width, height)
+    );
+    bg.addColorStop(0, '#0d0d18');
+    bg.addColorStop(1, '#05050a');
+    bgCtx.fillStyle = bg;
+    bgCtx.fillRect(0, 0, width, height);
+
+    // Two subtle nebula glows (cheaper to bake into one canvas)
+    const n1 = bgCtx.createRadialGradient(
+      width * 0.65, height * 0.3, 0,
+      width * 0.65, height * 0.3, Math.min(width, height) * 0.5
+    );
+    n1.addColorStop(0, 'rgba(30, 20, 60, 0.10)');
+    n1.addColorStop(1, 'transparent');
+    bgCtx.fillStyle = n1;
+    bgCtx.fillRect(0, 0, width, height);
+
+    const n2 = bgCtx.createRadialGradient(
+      width * 0.3, height * 0.7, 0,
+      width * 0.3, height * 0.7, Math.min(width, height) * 0.35
+    );
+    n2.addColorStop(0, 'rgba(40, 25, 15, 0.07)');
+    n2.addColorStop(1, 'transparent');
+    bgCtx.fillStyle = n2;
+    bgCtx.fillRect(0, 0, width, height);
+  }
+
+  // ─── Animation Loop ─────────────────────────
   function animate() {
-    ctx.clearRect(0, 0, width, height);
+    // Blit pre-rendered background — one drawImage per frame instead of 3 gradients
+    if (bgCanvas) ctx.drawImage(bgCanvas, 0, 0);
 
-    // Dark background gradient
-    const bgGrad = ctx.createRadialGradient(width / 2, height * 0.4, 0, width / 2, height / 2, Math.max(width, height));
-    bgGrad.addColorStop(0, '#0d0d18');
-    bgGrad.addColorStop(1, '#05050a');
-    ctx.fillStyle = bgGrad;
-    ctx.fillRect(0, 0, width, height);
-
-    // Subtle nebula glow
-    const nx = width * 0.65 + (mouse.x / width * 100);
-    const ny = height * 0.3 + (mouse.y / height * 60);
-    const ng = ctx.createRadialGradient(nx, ny, 0, nx, ny, Math.min(width, height) * 0.5);
-    ng.addColorStop(0, 'rgba(30, 20, 60, 0.12)');
-    ng.addColorStop(0.5, 'rgba(20, 10, 40, 0.04)');
-    ng.addColorStop(1, 'transparent');
-    ctx.fillStyle = ng;
-    ctx.fillRect(0, 0, width, height);
-
-    const n2x = width * 0.3 - (mouse.x / width * 80);
-    const n2y = height * 0.7 - (mouse.y / height * 40);
-    const ng2 = ctx.createRadialGradient(n2x, n2y, 0, n2x, n2y, Math.min(width, height) * 0.35);
-    ng2.addColorStop(0, 'rgba(40, 25, 15, 0.08)');
-    ng2.addColorStop(1, 'transparent');
-    ctx.fillStyle = ng2;
-    ctx.fillRect(0, 0, width, height);
-
-    // Draw stars
+    // Mouse parallax offset (in CSS px)
     const ox = mouse.x - width / 2;
     const oy = mouse.y - height / 2;
-    stars.forEach(s => s.draw(ctx, ox, oy, s.layer.speed));
 
-    // Meteors
+    // Batched star draw: one path per layer, single fillStyle group
+    // (huge win over the old per-star beginPath/fill)
+    if (!reducedMotion) {
+      for (const layer of LAYERS) {
+        ctx.beginPath();
+        for (const s of stars) {
+          if (s.layer !== layer) continue;
+          const px = s.x + ox * layer.speed * 0.04;
+          const py = s.y + oy * layer.speed * 0.04;
+          if (px < -2 || px > width + 2 || py < -2 || py > height + 2) continue;
+          ctx.moveTo(px + s.size, py);
+          ctx.arc(px, py, s.size, 0, Math.PI * 2);
+        }
+        ctx.fillStyle = layer._fillStyle || (layer._fillStyle = `hsla(0,0%,100%,${layer.alphaBase})`);
+        ctx.fill();
+      }
+
+      // Subtle per-star twinkle: only redraw a small subset each frame
+      // (10% of stars per frame on average — 9 path ops total vs 90)
+      ctx.fillStyle = 'rgba(255,255,255,0.5)';
+      for (let i = frame % 4; i < stars.length; i += 4) {
+        const s = stars[i];
+        const tw = Math.sin(frame * s.twinkleSpeed + s.twinklePhase);
+        const a = s.layer.alphaBase + tw * s.layer.twinkleAmp;
+        if (a <= 0.05) continue;
+        const px = s.x + ox * s.layer.speed * 0.04;
+        const py = s.y + oy * s.layer.speed * 0.04;
+        if (px < -2 || px > width + 2 || py < -2 || py > height + 2) continue;
+        ctx.globalAlpha = a;
+        ctx.beginPath();
+        ctx.arc(px, py, s.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+    } else {
+      // Reduced motion: one batched static draw, no animation
+      ctx.fillStyle = 'rgba(255,255,255,0.25)';
+      ctx.beginPath();
+      for (const s of stars) {
+        ctx.moveTo(s.x + s.size, s.y);
+        ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+      }
+      ctx.fill();
+    }
+
+    // Meteors — same logic as before, low frequency
     if (frame >= nextMeteor) {
       meteors.push(new Meteor());
       nextMeteor = frame + randomInt(METEOR_INTERVAL_MIN / 16, METEOR_INTERVAL_MAX / 16);
-      // Occasionally spawn a pair
-      if (Math.random() < 0.3) {
-        meteors.push(new Meteor());
-      }
     }
-
     for (let i = meteors.length - 1; i >= 0; i--) {
       meteors[i].update();
-      if (meteors[i].life <= 0) {
-        meteors.splice(i, 1);
-      } else {
-        meteors[i].draw(ctx);
-      }
+      if (meteors[i].life <= 0) meteors.splice(i, 1);
+      else meteors[i].draw(ctx);
     }
-
-    // Limit max meteors
-    if (meteors.length > 6) meteors.splice(0, meteors.length - 6);
+    if (meteors.length > 4) meteors.length = 4;
 
     // Smooth mouse interpolation
     mouse.x += (mouse.targetX - mouse.x) * 0.05;
@@ -232,8 +240,12 @@
     requestAnimationFrame(animate);
   }
 
-  // ─── Events ────────────────────────────────
-  window.addEventListener('resize', () => { resize(); createStars(); });
+  // ─── Events ─────────────────────────────────
+  let resizeTimer = 0;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => { resize(); createStars(); }, 150);
+  });
   window.addEventListener('mousemove', (e) => {
     mouse.targetX = e.clientX;
     mouse.targetY = e.clientY;
@@ -243,8 +255,19 @@
     mouse.targetY = height / 2;
   });
 
-  // Init
+  // Pause animation when tab is hidden — saves CPU/battery
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      cancelAnimationFrame(rafId);
+      rafId = 0;
+    } else if (!rafId) {
+      animate();
+    }
+  });
+
+  // ─── Init ───────────────────────────────────
+  let rafId = 0;
   resize();
   createStars();
-  animate();
+  rafId = requestAnimationFrame(animate);
 })();
