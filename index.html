@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>蛋蛋不语 - 全平台影视应用</title>
+    <meta name="description" content="蛋蛋不语全平台影视应用官方下载与安装指南，支持 iOS、Android、Android TV、macOS 与 Windows。">
+    <meta name="theme-color" content="#000000">
 
     <!-- 引入字体图标 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -1139,6 +1141,7 @@
             }
         }
     </style>
+    <link rel="stylesheet" href="apple-dark.css">
 </head>
 
 <body>
@@ -1148,49 +1151,110 @@
         <!-- ========== NAVIGATION ========== -->
         <nav class="navbar" role="navigation" aria-label="主导航">
             <a href="#" class="navbar-brand" aria-label="蛋蛋不语 首页">
-                <img src="https://hyhycw.oss-cn-shenzhen.aliyuncs.com/cw/placehold.png" alt="蛋蛋不语 Logo">
-                <div>
-                    <div class="navbar-brand-text">蛋蛋不语</div>
-                    <div class="navbar-tagline">全平台影视</div>
-                </div>
+                <span class="brand-mark" aria-hidden="true">蛋</span>
+                <span class="navbar-brand-text">蛋蛋不语</span>
             </a>
             <div class="navbar-links">
+                <a href="#overview">产品</a>
                 <a href="#download">下载</a>
-                <a href="#quotes">语录</a>
-                <a href="#tutorial">安装教程</a>
+                <a href="#tutorial">安装指南</a>
+                <a href="#quotes">光影留声</a>
             </div>
+            <a class="navbar-action" href="#download">
+                立即下载
+            </a>
         </nav>
 
         <!-- ========== HERO ========== -->
         <section class="hero" id="hero">
-            <div class="container">
-                <div class="reveal visible delay-1">
-                    <span class="hero-badge">
-                        <i class="fas fa-film"></i>
-                        全平台影视应用
-                    </span>
+            <div class="hero-glow hero-glow--blue" aria-hidden="true"></div>
+            <div class="hero-glow hero-glow--violet" aria-hidden="true"></div>
+            <div class="container hero-container">
+                <div class="hero-copy">
+                    <div class="hero-badge reveal visible delay-1">全平台影视应用</div>
+
+                    <h1 class="hero-title reveal visible delay-2">
+                        让好内容，<br>
+                        <span>陪你在每一块屏幕。</span>
+                    </h1>
+
+                    <p class="hero-intro reveal visible delay-3">
+                        蛋蛋不语为手机、电视与桌面设备带来统一、简洁的观影入口。<br class="desktop-only">
+                        选择你的平台，然后开始。
+                    </p>
+
+                    <div class="hero-actions reveal visible delay-4">
+                        <a class="primary-action" href="#download">
+                            下载蛋蛋不语 <i class="fas fa-chevron-right"></i>
+                        </a>
+                        <a class="secondary-action" href="#tutorial">
+                            查看安装指南 <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </div>
+
+                    <div class="hero-platforms reveal visible delay-5" aria-label="支持平台">
+                        <span><i class="fab fa-apple"></i> iOS 与 macOS</span>
+                        <span><i class="fab fa-android"></i> Android 与电视</span>
+                        <span><i class="fab fa-windows"></i> Windows</span>
+                    </div>
                 </div>
 
-                <h1 class="hero-title reveal visible delay-2">蛋蛋不语</h1>
+                <div class="product-showcase reveal-scale visible delay-5">
+                    <div class="product-halo" aria-hidden="true"></div>
+                    <div class="product-frame">
+                        <img src="https://hyhycw.oss-cn-shenzhen.aliyuncs.com/cw/placehold.png" alt="蛋蛋不语多端应用界面预览">
+                    </div>
+                    <div class="product-caption">
+                        <span>为不同设备而生</span>
+                        <span>iPhone · Android · TV · Mac · PC</span>
+                    </div>
+                </div>
 
-                <p class="hero-tagline reveal visible delay-3">该软件仅用于内部测试技术学习研究，非商业用途，不可宣传分发安装，请下载安装后24小时内删除，关注公众号《蛋蛋不语》联系开发者</p>
-
-                <p class="hero-description reveal visible delay-4">
-                    你知道，有些鸟儿是注定不会被关在牢笼里的，它们的每一片羽毛都闪耀着自由的光辉。<br>
+                <p class="hero-description reveal visible delay-5">
+                    “你知道，有些鸟儿是注定不会被关在牢笼里的，它们的每一片羽毛都闪耀着自由的光辉。”
                     <em>— 《肖申克的救赎》</em>
                 </p>
 
-                <!-- App Preview -->
-                <div class="app-preview reveal-scale visible delay-5">
-                    <div class="app-preview-frame">
-                        <div class="app-preview-chrome">
-                            <span class="chrome-dot"></span>
-                            <span class="chrome-dot"></span>
-                            <span class="chrome-dot"></span>
-                            <span class="chrome-url">dandbuyu.app</span>
+                <div class="disclaimer-strip reveal visible delay-6">
+                    <span class="disclaimer-label"><i class="fas fa-circle-info"></i> 使用须知</span>
+                    <p class="hero-tagline reveal visible delay-3">该软件仅用于内部测试技术学习研究，非商业用途，不可宣传分发安装，请下载安装后24小时内删除，关注公众号《蛋蛋不语》联系开发者</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="overview-section" id="overview">
+            <div class="container">
+                <div class="section-heading reveal">
+                    <span class="section-kicker">一个应用，多种设备</span>
+                    <h2>从掌心，到客厅。<br>处处都是熟悉的体验。</h2>
+                    <p>针对不同屏幕与操作方式精心适配，让你在常用设备上都能轻松开始。</p>
+                </div>
+
+                <div class="overview-grid">
+                    <article class="overview-card overview-card--wide reveal">
+                        <div class="overview-copy">
+                            <span class="card-eyebrow">全平台支持</span>
+                            <h3>你喜欢的设备，<br>它都在。</h3>
+                            <p>覆盖 iOS、Android、Android TV、macOS 与 Windows。</p>
                         </div>
-                        <img src="https://hyhycw.oss-cn-shenzhen.aliyuncs.com/cw/placehold.png" alt="蛋蛋不语界面预览">
-                    </div>
+                        <div class="device-cloud" aria-hidden="true">
+                            <span class="device-icon device-icon--phone"><i class="fas fa-mobile-screen-button"></i></span>
+                            <span class="device-icon device-icon--tv"><i class="fas fa-tv"></i></span>
+                            <span class="device-icon device-icon--desktop"><i class="fas fa-display"></i></span>
+                        </div>
+                    </article>
+                    <article class="overview-card reveal">
+                        <div class="overview-symbol overview-symbol--blue"><i class="fas fa-arrow-down"></i></div>
+                        <span class="card-eyebrow">简单下载</span>
+                        <h3>找到版本，<br>一步抵达。</h3>
+                        <p>所有平台入口清晰归类，无需在页面中反复寻找。</p>
+                    </article>
+                    <article class="overview-card reveal">
+                        <div class="overview-symbol overview-symbol--purple"><i class="fas fa-wand-magic-sparkles"></i></div>
+                        <span class="card-eyebrow">清楚指引</span>
+                        <h3>第一次安装，<br>也能从容完成。</h3>
+                        <p>按设备整理安装步骤，并集中解答常见问题。</p>
+                    </article>
                 </div>
             </div>
         </section>
@@ -1198,6 +1262,11 @@
         <!-- ========== DOWNLOAD SECTION ========== -->
         <section class="download-section" id="download">
             <div class="container">
+                <div class="section-heading section-heading--download reveal">
+                    <span class="section-kicker">下载</span>
+                    <h2>选择适合你的版本。</h2>
+                    <p>从手机、电视到电脑，每个设备都有合适的入口。</p>
+                </div>
                 <!-- iOS Group -->
                 <div class="download-group reveal">
                     <div class="section-label">
@@ -1205,7 +1274,7 @@
                         Apple 平台
                     </div>
                     <div class="download-grid">
-                        <a href="https://testflight.apple.com/join/bDb7WBtD" class="btn btn--ios">
+                        <a href="https://testflight.apple.com/join/rwEncmX3" class="btn btn--ios">
                             <i class="fab fa-apple"></i>
                             TestFlight 安装
                         </a>
@@ -1286,8 +1355,9 @@
         <section class="tutorial-section" id="tutorial">
             <div class="container">
                 <div class="tutorial-header reveal">
+                    <span class="section-kicker">安装指南</span>
                     <h2>安装教程</h2>
-                    <p>各平台详细安装指南，快速解决安装问题</p>
+                    <p>选好设备，跟随清晰步骤完成安装。</p>
                 </div>
 
                 <div class="tutorial-tabs reveal">
@@ -1473,6 +1543,7 @@
 
                 <!-- FAQ -->
                 <div class="tutorial-faq reveal">
+                    <span class="section-kicker">需要帮助？</span>
                     <h3>常见问题</h3>
                     <div class="faq-list">
                         <div class="faq-item">
@@ -1529,8 +1600,9 @@
         <section class="quotes-section" id="quotes">
             <div class="container">
                 <div class="quotes-header reveal">
+                    <span class="section-kicker">光影留声</span>
                     <h2>光影留声</h2>
-                    <p>那些被时间铭记的台词</p>
+                    <p>有些故事结束在银幕，有些话会一直留在心里。</p>
                 </div>
 
                 <div class="quotes-grid">
@@ -1625,9 +1697,24 @@
         <footer class="footer">
             <div class="container">
                 <div class="footer-content">
-                    <span class="footer-brand">蛋蛋不语</span>
+                    <div class="footer-main">
+                        <div class="footer-identity">
+                            <span class="brand-mark brand-mark--small" aria-hidden="true">蛋</span>
+                            <div>
+                                <span class="footer-brand">蛋蛋不语</span>
+                                <span class="footer-tagline">让好内容，陪你在每一块屏幕。</span>
+                            </div>
+                        </div>
+                        <button class="footer-top" type="button" onclick="scrollToTop()" aria-label="返回页面顶部">
+                            返回顶部
+                            <i class="fas fa-arrow-up"></i>
+                        </button>
+                    </div>
                     <div class="footer-divider"></div>
-                    <span class="footer-copy">该软件仅用于技术学习 &middot; 仅供个人研究使用</span>
+                    <div class="footer-bottom">
+                        <span class="footer-copy">该软件仅用于技术学习 &middot; 仅供个人研究使用</span>
+                        <span class="footer-coordinate">蛋蛋不语</span>
+                    </div>
                 </div>
             </div>
         </footer>
