@@ -15,7 +15,7 @@
   document.querySelector('meta[name="theme-color"]').content = document.documentElement.dataset.theme === 'light' ? '#f7f6fa' : '#0b0b10';
   </script>
   <link href="styles.css" rel="stylesheet"/>
-  <script defer="" src="site.js">
+  <script defer="" src="site.js?v=2026102302">
   </script>
   <noscript>
    <style>
@@ -744,6 +744,8 @@
        为你常用的设备，选择对应版本。
        <br/>
        第一次安装？下面的指南陪你完成。
+       <span class="release-meta" data-release-meta="" hidden="">
+       </span>
       </p>
      </div>
      <div class="download-grid">
@@ -766,16 +768,16 @@
         在掌心，随时开始。
        </p>
        <div class="download-actions">
-        <a class="download-link" href="https://testflight.apple.com/join/rwEncmX3">
+        <a class="download-link" data-release="testflight" href="https://testflight.apple.com/join/rwEncmX3">
          <span>
           TestFlight 安装
          </span>
          <svg aria-hidden="true" class="icon">
           <use href="#i-arrow">
-          </use>
+          </use>test
          </svg>
         </a>
-        <a class="download-link" href="https://danboxq.lanzouq.com/iT2CV4czi3eh">
+        <a class="download-link" data-release="ios_ipa" href="https://danboxq.lanzouq.com/iT2CV4czi3eh">
          <span>
           IPA · 需自签
          </span>
@@ -821,7 +823,7 @@
         日常里的小小精彩。
        </p>
        <div class="download-actions">
-        <a class="download-link" href="https://danboxq.lanzouq.com/iIr6s4cznp2h">
+        <a class="download-link" data-release="android" href="https://danboxq.lanzouq.com/iIr6s4cznp2h">
          <span>
           下载 Android
          </span>
@@ -913,7 +915,7 @@
         大屏幕，看得尽兴。
        </p>
        <div class="download-actions">
-        <a class="download-link" href="https://danboxq.lanzouq.com/iXTyx4czib1c">
+        <a class="download-link" data-release="mac_arm64" href="https://danboxq.lanzouq.com/iXTyx4czib1c">
          <span>
           Apple Silicon
          </span>
@@ -922,7 +924,7 @@
           </use>
          </svg>
         </a>
-        <a class="download-link" href="https://danboxq.lanzouq.com/iC5ji4czicmj">
+        <a class="download-link" data-release="mac_intel_x64" href="https://danboxq.lanzouq.com/iC5ji4czicmj">
          <span>
           Intel
          </span>
@@ -968,9 +970,18 @@
         熟悉桌面，全新故事。
        </p>
        <div class="download-actions">
-        <a class="download-link" href="https://danboxq.lanzouq.com/iMSF44czie6f">
+        <a class="download-link" data-release="windows" href="https://danboxq.lanzouq.com/iMSF44czie6f">
          <span>
           下载 Windows
+         </span>
+         <svg aria-hidden="true" class="icon">
+          <use href="#i-arrow">
+          </use>
+         </svg>
+        </a>
+        <a class="download-link" data-release="linux" hidden="">
+         <span>
+          Linux x64
          </span>
          <svg aria-hidden="true" class="icon">
           <use href="#i-arrow">

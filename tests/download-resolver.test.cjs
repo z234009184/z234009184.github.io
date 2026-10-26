@@ -59,3 +59,24 @@ test('aborts a stalled request and allows a subsequent retry', async () => {
   await assert.rejects(resolve(originalUrl, 15), error => error.name === 'AbortError');
   assert.equal(await resolve(originalUrl), 'https://example.test/retry.apk');
 });
+
+test('allows the PHP fallback chain to finish after the old 12-second cutoff', async () => {
+  const timers = [];
+  const context = vm.createContext({
+    AbortController, URL,
+    setTimeout: (callback, ms) => { const timer = { callback, ms }; timers.push(timer); return timer; },
+    clearTimeout() {}, document: { addEventListener() {} },
+    fetch: async (_url, { signal }) => {
+      for (const timer of timers) if (timer.ms <= 16000) timer.callback();
+      if (signal.aborted) throw new DOMException('Timed out', 'AbortError');
+      return { ok: true, json: async () => ({ code: 200, downUrl: 'https://example.test/app.zip' }) };
+    }
+  });
+  vm.runInContext(source, context);
+  assert.equal(await context.resolveLanzouDirectUrl(originalUrl), 'https://example.test/app.zip');
+});
+
+test('preserves a server error even when a response includes a stale URL', async () => {
+  const resolve = resolver(async () => ({ ok: true, json: async () => ({ code: 400, msg: '解析下载参数失败', downUrl: 'https://example.test/stale.zip' }) }));
+  await assert.rejects(resolve(originalUrl), error => error.name === 'ResolverError' && error.message === '解析下载参数失败');
+});

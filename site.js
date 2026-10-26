@@ -1,8 +1,74 @@
 'use strict';
 
 const LANZOU_RESOLVER_API = 'https://lanzou.opengl.top/index.php?url=';
+const RELEASE_MANIFEST_URL = 'latest.json';
 
-async function resolveLanzouDirectUrl(lanzouUrl, timeoutMs = 12000) {
+// 发版脚本每次发布都会原子替换 latest.json；读取失败时保留页面内置链接作为兜底。
+async function loadRelease(timeoutMs = 8000) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const response = await fetch(RELEASE_MANIFEST_URL + '?t=' + Date.now(), {
+      cache: 'no-store',
+      signal: controller.signal
+    });
+    if (!response.ok) throw new Error('release_http_error');
+    const release = await response.json();
+    if (!release || release.schema !== 1 || typeof release.downloads !== 'object') throw new Error('invalid_release');
+    return release;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+function safeUrl(value, hostPattern) {
+  try {
+    const url = new URL(value);
+    return url.protocol === 'https:' && hostPattern.test(url.hostname) ? url.href : null;
+  } catch (_) {
+    return null;
+  }
+}
+
+function applyRelease(release) {
+  document.querySelectorAll('[data-release]').forEach(link => {
+    const key = link.dataset.release;
+    let url = null;
+    if (key === 'testflight') {
+      // 只分发审核已通过的公测链接，随机分摊到各个包的名额
+      const approved = (Array.isArray(release.testflight) ? release.testflight : [])
+        .filter(item => item && item.review === 'APPROVED')
+        .map(item => safeUrl(item.url, /^testflight\.apple\.com$/i))
+        .filter(Boolean);
+      if (approved.length) url = approved[Math.floor(Math.random() * approved.length)];
+    } else {
+      const item = release.downloads[key];
+      url = item && safeUrl(item.url, /(^|\.)lanzou[a-z]*\.com$/i);
+    }
+    if (!url) return;
+    link.href = url;
+    link.hidden = false;
+  });
+  const meta = document.querySelector('[data-release-meta]');
+  if (meta && typeof release.version === 'string') {
+    const date = typeof release.published_at === 'string' ? release.published_at.slice(0, 10) : '';
+    meta.textContent = '最新版本 v' + release.version + (date ? ' · ' + date + ' 更新' : '');
+    meta.hidden = false;
+    meta.style.display = 'block';
+  }
+}
+
+// 解析服务需回源抓取蓝奏多个页面，偶尔超过 10 秒；超时放宽并对非超时失败重试一次。
+async function resolveLanzouDirectUrlWithRetry(lanzouUrl) {
+  try {
+    return await resolveLanzouDirectUrl(lanzouUrl);
+  } catch (error) {
+    if (error.name === 'AbortError') throw error;
+    return resolveLanzouDirectUrl(lanzouUrl);
+  }
+}
+
+async function resolveLanzouDirectUrl(lanzouUrl, timeoutMs = 25000) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), timeoutMs);
   try {
@@ -34,6 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const mobile = window.matchMedia('(max-width: 767px)');
   root.classList.add('enhanced');
+  loadRelease().then(applyRelease).catch(() => { /* 保留页面内置下载链接 */ });
 
   // Apply the saved theme before paint; keep all controls in sync here.
   const themeButton = document.querySelector('.theme-toggle');
@@ -157,7 +224,7 @@ document.addEventListener('DOMContentLoaded', () => {
       feedback.textContent = '正在获取下载链接，请稍候。';
       fallback.hidden = true;
       try {
-        const directUrl = await resolveLanzouDirectUrl(link.href);
+        const directUrl = await resolveLanzouDirectUrlWithRetry(link.href);
         triggerDownload(directUrl);
         feedback.textContent = '下载已准备好。如未开始，可打开原始下载页面。';
       } catch (error) {
