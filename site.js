@@ -42,8 +42,16 @@ function applyRelease(release) {
         .filter(Boolean);
       if (approved.length) url = approved[Math.floor(Math.random() * approved.length)];
     } else {
-      const item = release.downloads[key];
-      url = item && safeUrl(item.url, /(^|\.)lanzou[a-z]*\.com$/i);
+      // 森络盘固定直链：覆盖上传后地址不变，只附带构建号避开缓存，不再用 latest.json 的链接覆盖
+      const fixed = safeUrl(link.getAttribute("href") || "", /(^|\.)senluopan\.com$/i);
+      if (fixed) {
+        const fixedUrl = new URL(fixed);
+        if (release.build) fixedUrl.searchParams.set("v", String(release.build));
+        url = fixedUrl.href;
+      } else {
+        const item = release.downloads[key];
+        url = item && safeUrl(item.url, /(^|\.)(lanzou[a-z]*|senluopan)\.com$/i);
+      }
     }
     if (!url) return;
     link.href = url;
